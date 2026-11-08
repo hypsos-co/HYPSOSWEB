@@ -13,7 +13,9 @@ const SYN: Record<string, string[]> = {
   short: ['short'], calcoes: ['short'], bermuda: ['short'],
   gorro: ['beanie'], hat: ['beanie'], accesorios: ['beanie'], acessorios: ['beanie'],
   negro: ['black', 'negro', 'preto'], black: ['negro', 'preto'], preto: ['black', 'negro'],
-  rojo: ['red', 'vermelho'], red: ['rojo', 'vermelho'], vermelho: ['red', 'rojo'],
+  rojo: ['red', 'vermelho'], roja: ['rojo', 'red'], rojas: ['rojo'], rojos: ['rojo'], red: ['rojo', 'vermelho'], vermelho: ['red', 'rojo'], vermelha: ['vermelho', 'red'],
+  negra: ['negro', 'black'], negras: ['negro'], negros: ['negro'], preta: ['preto', 'black'],
+  sudaderas: ['hoodie', 'crewneck', 'sweat'], camisetas: ['tee'], gorros: ['beanie'], hoodies: ['hoodie'],
   nuevo: ['new'], novo: ['new'], novedades: ['new'],
 };
 

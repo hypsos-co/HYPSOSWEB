@@ -119,3 +119,8 @@
 .cross3d__canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; opacity: 0; transition: opacity 1.4s var(--ease-standard); }
 .cross3d.is-3d .cross3d__canvas { opacity: 1; }
 @media (max-width: 749px) { .cross3d__svg { width: 56vw; top: 40%; } }
+@media (max-width: 749px) {
+  .pcard__badges { right: 44px; }
+  .pcard__badges .badge { height: 18px; font-size: 8.5px; padding: 0 5px; }
+  .pcard__badges .badge--outline:not(:first-child) { display: none; }
+}

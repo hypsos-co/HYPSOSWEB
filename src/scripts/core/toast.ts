@@ -14,6 +14,8 @@ export function toast(message: string, action?: { label: string; onClick?: () =>
     a.addEventListener('click', () => { action.onClick?.(); dismiss(); });
     el.appendChild(a);
   }
+  host.querySelectorAll<HTMLElement>('.toast').forEach((t) => { if (t.dataset.msg === message) t.remove(); });
+  el.dataset.msg = message;
   while (host.children.length > 2) host.firstElementChild?.remove();
   host.appendChild(el);
   let timer = window.setTimeout(dismiss, ms);
