@@ -1,0 +1,303 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/ui/Breadcrumbs.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import Price from '../../../components/ui/Price.astro';
+import ProductCard from '../../../components/product/ProductCard.astro';
+import Cross from '../../../components/brand/Cross.astro';
+import { getDict, fmt, LOCALES, DEFAULT_LOCALE, lp, type Locale } from '../../../i18n';
+import { getCatalog, clientProduct } from '../../../lib/catalog';
+import { pickSrc } from '../../../lib/img';
+import type { Product } from '../../../lib/types';
+
+export async function getStaticPaths() {
+  const out = [];
+  for (const lang of LOCALES) {
+    const cat = await getCatalog(lang);
+    for (const p of cat.products) out.push({ params: { lang: lang === DEFAULT_LOCALE ? undefined : lang, handle: p.handle }, props: { lang, product: p } });
+  }
+  return out;
+}
+const { lang, product: p } = Astro.props as { lang: Locale; product: Product };
+const t = getDict(lang);
+const catalog = await getCatalog(lang);
+const colorOpt = p.options.find((o) => o.key === 'color');
+const sizeOpt = p.options.find((o) => o.key === 'size');
+const color0 = colorOpt?.values.find((c) => p.variants.some((v) => v.available && v.options.some((o) => o.value === c))) ?? colorOpt?.values[0] ?? null;
+const oneSize = (sizeOpt?.values.length ?? 0) <= 1;
+const related = catalog.products.filter((x) => x.handle !== p.handle).sort((a, b) => Number(b.category === p.category) - Number(a.category === p.category)).slice(0, 4);
+const firstImg = p.images.find((i) => i.color === color0) ?? p.images[0];
+const storyMods = p.story.filter((s) => s.text || s.images.length);
+const storyLabel: Record<string, string> = t.product.story as any;
+const pad = (n: number) => String(n).padStart(2, '0');
+const site = Astro.site!;
+const url = new URL(lp(lang, `/products/${p.handle}`), site).href;
+const ld = catalog.source === 'shopify' ? {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: p.title,
+  description: p.description,
+  brand: { '@type': 'Brand', name: 'HYPSOS' },
+  image: p.images.slice(0, 6).map((i) => new URL(i.src, site).href),
+  offers: p.variants.map((v) => ({
+    '@type': 'Offer',
+    sku: v.id,
+    price: v.price.amount.toFixed(2),
+    priceCurrency: v.price.currencyCode,
+    availability: v.available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    url,
+  })),
+} : undefined;
+const desc = p.seo.description || p.description;
+---
+<BaseLayout lang={lang} path={`/products/${p.handle}`} title={p.seo.title || p.title} description={desc} image={firstImg?.src} imageAlt={firstImg?.alt} type="product" jsonLd={ld} mode="product">
+  <article class="pdp" data-pdp data-handle={p.handle}>
+    <script type="application/json" data-pdp-json set:html={JSON.stringify(clientProduct(p))} />
+    <div class="pdp__grid">
+      <div class="pdp__gallery" data-gallery aria-roledescription="carousel" aria-label={t.product.gallery}>
+        <div class="pdp__track no-scrollbar" data-gallery-track tabindex="0">
+          {p.images.map((im, i) => (
+            <figure class="pdp__slide plinth" data-slide data-color={im.color ?? ''} hidden={!!color0 && !!im.color && im.color !== color0} data-cursor="view" data-cursor-label="Zoom">
+              <button class="pdp__zoom-btn" type="button" data-zoom={i} aria-label={`${t.product.zoom}: ${im.alt}`}>
+                <img src={im.src} srcset={im.srcset} sizes="(min-width: 1100px) 58vw, 100vw" width={im.width} height={im.height} alt={im.alt} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
+              </button>
+              {im.view && <figcaption class="pdp__view t-label">{im.view === 'back' ? t.common.back_view : im.view === 'front' ? t.common.front : im.view}</figcaption>}
+            </figure>
+          ))}
+        </div>
+        <div class="pdp__gnav">
+          <button class="icon-btn" type="button" data-gallery-prev aria-label={t.common.previous}><Icon name="arrow-left" /></button>
+          <div class="pdp__dots" data-gallery-dots role="tablist"></div>
+          <button class="icon-btn" type="button" data-gallery-next aria-label={t.common.next}><Icon name="arrow-right" /></button>
+        </div>
+      </div>
+
+      <div class="pdp__info">
+        <div class="pdp__sticky">
+          <Breadcrumbs lang={lang} items={[{ label: t.nav.shop, href: lp(lang, '/shop') }, { label: p.title }]} />
+          <div class="pdp__badges">
+            {p.isNew && <span class="badge">{t.common.new}</span>}
+            {p.demo && <span class="badge badge--outline">DEMO</span>}
+            <span class="t-label t-muted">{p.productType}</span>
+          </div>
+          <h1 class="pdp__title t-section">{p.title}</h1>
+          <div class="pdp__price" data-pdp-price><Price amount={p.priceRange.min.amount} lang={lang} currency={p.priceRange.min.currencyCode} class="t-h3" /></div>
+
+          <form class="pdp__form" data-pdp-form onsubmit="return false">
+            {p.options.map((o, oi) => (
+              <fieldset class="pdp__opt" data-opt={oi} data-key={o.key}>
+                <legend class="pdp__legend">
+                  <span class="t-label t-muted">{o.name}</span>
+                  <span class="t-label" data-opt-value>{o.key === 'color' ? color0 : ''}</span>
+                  {o.key === 'size' && !oneSize && <button type="button" class="link-u t-label pdp__sg" data-sizeguide-open aria-haspopup="dialog"><Icon name="ruler" size={14} /> {t.common.sizeGuide}</button>}
+                </legend>
+                <div class="pdp__vals">
+                  {o.values.map((v) => {
+                    const thumb = o.key === 'color' ? p.images.find((i) => i.color === v && i.view === 'front') ?? p.images.find((i) => i.color === v) : null;
+                    return (
+                      <label class:list={['pdp__val', { 'pdp__val--swatch': !!thumb }]}>
+                        <input class="sr-only" type="radio" name={`opt-${oi}`} value={v} checked={(o.key === 'color' && v === color0) || (o.values.length === 1)} />
+                        {thumb ? (
+                          <span class="pdp__swatch plinth"><img src={pickSrc(thumb, 480)} alt="" width="48" height="60" loading="lazy" /><span class="sr-only">{v}</span></span>
+                        ) : (
+                          <span class="chip">{v}</span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            ))}
+
+            <div class="pdp__row">
+              <div class="qty" role="group" aria-label={t.common.quantity}>
+                <button type="button" class="qty__btn" data-qty-step="-1" aria-label={t.common.decrease}>−</button>
+                <input type="number" inputmode="numeric" min="1" max="10" value="1" data-qty aria-label={t.common.quantity} />
+                <button type="button" class="qty__btn" data-qty-step="1" aria-label={t.common.increase}>+</button>
+              </div>
+              <p class="pdp__stock t-small" data-stock aria-live="polite"></p>
+            </div>
+
+            <div class="pdp__ctas">
+              <button class="btn btn--lg btn--accent pdp__add" type="button" data-pdp-add data-cursor="add" data-label-add={t.common.addToBag} data-label-select={t.product.selectSizeFirst} data-label-soldout={t.common.soldOut}>
+                <span data-add-label>{oneSize ? t.common.addToBag : t.product.selectSizeFirst}</span>
+                <Icon name="bag" class="btn__arrow" />
+              </button>
+              <button class="icon-btn pdp__fav" type="button" data-fav={p.handle} aria-pressed="false" aria-label={t.common.addFav}><Icon name="heart" /></button>
+            </div>
+            <p class="pdp__msg t-small" data-pdp-msg role="status"></p>
+          </form>
+
+          <div class="acc pdp__acc">
+            <details open>
+              <summary>{t.product.description}<span class="acc__icon" aria-hidden="true"></span></summary>
+              <div class="acc__body">{p.descriptionHtml ? <div set:html={p.descriptionHtml} /> : <p>{p.description}</p>}</div>
+            </details>
+            <details>
+              <summary>{t.product.details}<span class="acc__icon" aria-hidden="true"></span></summary>
+              <div class="acc__body">
+                <dl class="pdp__dl">
+                  <dt>{t.product.composition}</dt><dd>{p.composition ?? <span class="t-muted">{t.product.pendingInfo}</span>}</dd>
+                  <dt>{t.product.care}</dt><dd>{p.care ?? <span class="t-muted">{t.product.pendingInfo}</span>}</dd>
+                  {p.details.map((d) => <><dt>—</dt><dd>{d}</dd></>)}
+                </dl>
+              </div>
+            </details>
+            <details>
+              <summary>{t.product.shipping}<span class="acc__icon" aria-hidden="true"></span></summary>
+              <div class="acc__body">
+                <p>{t.product.shippingText}</p>
+                <p class="pdp__links"><a class="link-u link-u--on" href={lp(lang, '/help/shipping')}>{t.footer.help}: {lang === 'es' ? 'Envíos' : lang === 'pt' ? 'Envios' : 'Shipping'}</a> · <a class="link-u link-u--on" href={lp(lang, '/help/returns')}>{lang === 'es' ? 'Cambios y devoluciones' : lang === 'pt' ? 'Trocas e devoluções' : 'Exchanges & returns'}</a></p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {storyMods.length > 0 && (
+      <section class="story-mods" aria-label="Product story">
+        {storyMods.map((s, i) => (
+          <div class:list={['smod', `smod--${s.key}`]}>
+            <div class="smod__head wrap-full">
+              <p class="t-label"><span class="t-crimson">{pad(['silhouette', 'fabric', 'construction', 'graphics', 'fit', 'details'].indexOf(s.key) + 1)}</span> — {storyLabel[s.key]?.toUpperCase()}</p>
+              {s.key === 'silhouette' && <p class="t-lead">{s.text || t.product.silhouetteText}</p>}
+              {s.key !== 'silhouette' && s.text && <p class="smod__text t-h2" data-split>{s.text}</p>}
+            </div>
+            {s.images.length > 0 && (
+              <div class="smod__imgs wrap-full">
+                {s.images.map((im, j) => (
+                  <figure class="smod__fig plinth" data-reveal="mask" style={`--d:${j * 0.12}s`}>
+                    <img src={im.src} srcset={im.srcset} sizes="(min-width: 750px) 50vw, 100vw" width={im.width} height={im.height} alt={im.alt} loading="lazy" decoding="async" />
+                    <figcaption class="t-label">{im.view === 'back' ? t.common.back_view : t.common.front}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </section>
+    )}
+
+    <section class="section wrap-full" aria-labelledby="related-title">
+      <div class="shead">
+        <h2 id="related-title" class="t-h2" data-split>{t.product.related}</h2>
+        <span class="related__cross" aria-hidden="true"><Cross /></span>
+      </div>
+      <div class="pgrid">{related.map((r, i) => <ProductCard product={r} lang={lang} index={i} />)}</div>
+    </section>
+  </article>
+
+  <!-- zoom -->
+  <dialog class="zoom" data-zoom-dialog aria-label={t.product.zoom}>
+    <button class="icon-btn zoom__close" type="button" data-zoom-close aria-label={t.common.close}><Icon name="close" /></button>
+    <div class="zoom__stage" data-zoom-stage><img alt="" data-zoom-img /></div>
+  </dialog>
+
+  <!-- size guide -->
+  <dialog class="sg" data-sizeguide aria-labelledby="sg-title">
+    <div class="sg__head"><h2 id="sg-title" class="t-h3">{t.common.sizeGuide}</h2><button class="icon-btn" type="button" data-sizeguide-close aria-label={t.common.close}><Icon name="close" /></button></div>
+    <div class="sg__body prose">
+      <p>{lang === 'es' ? 'Las medidas de cada prenda se publicarán cuando HYPSOS las confirme. Mientras tanto, consulta la guía general.' : lang === 'pt' ? 'As medidas de cada peça serão publicadas quando a HYPSOS as confirmar. Entretanto, consulta o guia geral.' : 'Each garment’s measurements will be published once HYPSOS confirms them. Meanwhile, see the general guide.'}</p>
+      <table>
+        <thead><tr><th>{t.common.size}</th>{(sizeOpt?.values ?? []).map((s) => <th>{s}</th>)}</tr></thead>
+        <tbody>
+          {(lang === 'es' ? ['Pecho (cm)', 'Largo (cm)', 'Manga (cm)'] : lang === 'pt' ? ['Peito (cm)', 'Comprimento (cm)', 'Manga (cm)'] : ['Chest (cm)', 'Length (cm)', 'Sleeve (cm)']).map((r) => (
+            <tr><td>{r}</td>{(sizeOpt?.values ?? []).map(() => <td><span class="ph">[—]</span></td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+      <p><a href={lp(lang, '/help/size-guide')}>{t.common.sizeGuide} →</a></p>
+    </div>
+  </dialog>
+
+  <!-- mobile sticky add -->
+  <div class="pdp-bar" data-pdp-bar aria-hidden="true">
+    <span class="pdp-bar__t">{p.title}</span>
+    <button class="btn btn--accent" type="button" data-pdp-bar-add tabindex="-1">{t.common.addToBag}</button>
+  </div>
+</BaseLayout>
+
+<style>
+  .pdp__grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 0; }
+  .pdp__gallery { position: relative; }
+  .pdp__track { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  .pdp__slide { position: relative; margin: 0; aspect-ratio: 4 / 5; overflow: hidden; }
+  .pdp__slide:first-child:not([hidden]) { grid-column: 1 / -1; }
+  .pdp__zoom-btn { display: block; width: 100%; height: 100%; cursor: zoom-in; }
+  .pdp__zoom-btn img { width: 100%; height: 100%; object-fit: contain; transition: transform 1.4s var(--ease-standard); }
+  @media (hover: hover) { .pdp__zoom-btn:hover img { transform: scale(1.03); } }
+  .pdp__view { position: absolute; left: var(--space-4); bottom: var(--space-4); color: var(--color-obsidian); }
+  .pdp__gnav { display: none; }
+  .pdp__info { position: relative; border-left: 1px solid var(--border-subtle); }
+  .pdp__sticky { position: sticky; top: 0; display: flex; flex-direction: column; gap: var(--space-6); padding: calc(var(--header-h) + var(--space-8)) var(--gutter) var(--space-12); }
+  .pdp__badges { display: flex; gap: var(--space-3); align-items: center; }
+  .pdp__title { margin: 0; }
+  .pdp__form { display: grid; gap: var(--space-6); }
+  .pdp__opt { border: 0; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+  .pdp__legend { display: flex; gap: var(--space-3); align-items: center; width: 100%; padding: 0; margin-bottom: var(--space-3); }
+  .pdp__sg { margin-left: auto; display: inline-flex; gap: 6px; align-items: center; color: var(--text-secondary); }
+  .pdp__vals { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .pdp__val { position: relative; display: inline-flex; cursor: pointer; }
+  .pdp__val input:checked + .chip { background: var(--color-ice); color: var(--color-obsidian); border-color: var(--color-ice); }
+  .pdp__val.is-unavailable .chip { color: var(--text-muted); background-image: linear-gradient(to top right, transparent calc(50% - .5px), var(--text-muted) calc(50% - .5px), var(--text-muted) calc(50% + .5px), transparent calc(50% + .5px)); }
+  .pdp__val.is-unavailable input:checked + .chip { background-color: var(--ice-24); color: var(--color-ice); }
+  .pdp__swatch { display: block; width: 56px; aspect-ratio: 4/5; overflow: hidden; outline: 1px solid var(--border-subtle); outline-offset: 3px; transition: outline-color .3s; }
+  .pdp__swatch img { width: 100%; height: 100%; object-fit: contain; }
+  .pdp__val input:checked + .pdp__swatch { outline: 2px solid var(--color-crimson); }
+  .pdp__val input:focus-visible + .pdp__swatch { outline: 2px solid var(--focus-ring); }
+  .pdp__row { display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }
+  .pdp__stock { color: var(--text-secondary); display: flex; gap: var(--space-2); align-items: center; }
+  .pdp__stock::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--color-ice); }
+  .pdp__stock.is-low::before, .pdp__stock.is-out::before { background: var(--color-crimson); }
+  .pdp__stock:empty { display: none; }
+  .pdp__ctas { display: flex; gap: var(--space-3); }
+  .pdp__add { flex: 1; }
+  .pdp__fav { flex: none; width: 56px; height: 56px; border: 1px solid var(--border-strong); }
+  .pdp__fav[aria-pressed="true"] svg { fill: var(--color-crimson); stroke: var(--color-crimson); }
+  .pdp__msg:empty { display: none; }
+  .pdp__msg { border-left: 2px solid var(--color-crimson); padding-left: var(--space-3); color: var(--text-secondary); }
+  .pdp__dl { display: grid; grid-template-columns: auto 1fr; gap: var(--space-2) var(--space-6); margin: 0; }
+  .pdp__dl dt { font: 500 var(--fs-micro)/1.6 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--text-muted); }
+  .pdp__dl dd { margin: 0; }
+  .pdp__links { margin-top: var(--space-3); }
+
+  .smod { padding-block: var(--section-y) 0; }
+  .smod__head { display: grid; gap: var(--space-5); margin-bottom: var(--space-10); max-width: 960px; }
+  .smod__imgs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  .smod__fig { position: relative; margin: 0; aspect-ratio: 4/5; overflow: hidden; }
+  .smod__fig img { width: 100%; height: 100%; object-fit: contain; }
+  .smod__fig figcaption { position: absolute; left: var(--space-4); bottom: var(--space-4); color: var(--color-obsidian); }
+  .related__cross { width: 40px; color: var(--color-crimson); }
+
+  .zoom { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: var(--color-ice); }
+  .zoom::backdrop { background: var(--obsidian-90); }
+  .zoom__close { position: absolute; top: var(--space-4); right: var(--space-4); z-index: 2; color: var(--color-obsidian); background: var(--ice-72); }
+  .zoom__stage { width: 100%; height: 100%; overflow: hidden; cursor: zoom-out; touch-action: none; }
+  .zoom__stage img { width: 100%; height: 100%; object-fit: contain; transform: scale(var(--z, 1.8)); transform-origin: var(--zx, 50%) var(--zy, 50%); transition: transform-origin .2s linear; }
+  .sg { width: min(680px, calc(100vw - 32px)); max-height: 88dvh; padding: 0; border: 1px solid var(--border-strong); background: var(--color-obsidian); color: var(--color-ice); }
+  .sg::backdrop { background: var(--obsidian-72); backdrop-filter: blur(6px); }
+  .sg__head { display: flex; justify-content: space-between; align-items: center; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border-subtle); }
+  .sg__body { padding: var(--space-6); max-width: none; }
+
+  .pdp-bar { display: none; }
+  @media (max-width: 1099px) {
+    .pdp__grid { grid-template-columns: 1fr; }
+    .pdp__info { border-left: 0; }
+    .pdp__sticky { position: static; padding-top: var(--space-8); }
+    .pdp__gallery { padding-top: var(--header-h); }
+    .pdp__track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 0; overscroll-behavior-x: contain; }
+    .pdp__slide { flex: 0 0 100%; scroll-snap-align: start; }
+    .pdp__gnav { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) var(--gutter); }
+    .pdp__dots { display: flex; gap: 6px; }
+    .pdp__dots :global(button) { width: 18px; height: 3px; background: var(--ice-24); border-radius: 2px; transition: background-color .3s, width .5s var(--ease-standard); }
+    .pdp__dots :global(button[aria-selected="true"]) { width: 36px; background: var(--color-crimson); }
+    .pdp-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-sticky); display: flex; align-items: center; gap: var(--space-4); justify-content: space-between; padding: var(--space-3) var(--gutter) calc(var(--space-3) + env(safe-area-inset-bottom)); background: var(--obsidian-90); backdrop-filter: blur(12px); border-top: 1px solid var(--border-subtle); transform: translateY(110%); transition: transform .6s var(--ease-standard); }
+    .pdp-bar.is-on { transform: none; }
+    .pdp-bar__t { font-weight: 500; font-size: var(--fs-small); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  }
+</style>
+
+<script>
+  import '../../../scripts/pages/pdp';
+</script>

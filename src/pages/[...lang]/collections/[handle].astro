@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHead from '../../../components/ui/PageHead.astro';
+import Breadcrumbs from '../../../components/ui/Breadcrumbs.astro';
+import ShopView from '../../../components/product/ShopView.astro';
+import { getDict, LOCALES, DEFAULT_LOCALE, lp, type Locale } from '../../../i18n';
+import { getCatalog, productsIn } from '../../../lib/catalog';
+export async function getStaticPaths() {
+  const out = [];
+  for (const lang of LOCALES) {
+    const cat = await getCatalog(lang);
+    for (const c of cat.collections) out.push({ params: { lang: lang === DEFAULT_LOCALE ? undefined : lang, handle: c.handle }, props: { lang } });
+  }
+  return out;
+}
+const { lang } = Astro.props as { lang: Locale };
+const { handle } = Astro.params;
+const t = getDict(lang);
+const catalog = await getCatalog(lang);
+const col = catalog.collections.find((c) => c.handle === handle)!;
+const products = productsIn(catalog, handle!);
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: col.title,
+  description: col.description,
+  url: new URL(lp(lang, `/collections/${handle}`), Astro.site!).href,
+};
+---
+<BaseLayout lang={lang} path={`/collections/${handle}`} title={col.title} description={col.description || undefined} jsonLd={ld} mode="product">
+  <PageHead eyebrow={`HYPSOS / ${t.nav.collections.toUpperCase()}`} title={col.title} lead={col.description}>
+    <Breadcrumbs slot="crumbs" lang={lang} items={[{ label: t.nav.collections, href: lp(lang, '/collections') }, { label: col.title }]} />
+  </PageHead>
+  <section class="wrap-full" style="padding-bottom: var(--section-y)">
+    {products.length ? <ShopView lang={lang} products={products} /> : <div class="empty-state"><p class="t-h3">{t.shop.noResults}</p><a class="btn btn--ghost" href={lp(lang, '/shop')}>{t.nav.all}</a></div>}
+  </section>
+</BaseLayout>

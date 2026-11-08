@@ -1,0 +1,128 @@
+---
+import '@fontsource-variable/inter/index.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/fonts.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/components.css';
+
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import Overlays from '../components/layout/Overlays.astro';
+import DemoBanner from '../components/layout/DemoBanner.astro';
+import { getDict, clientStrings, lp, LOCALES, LOCALE_META, DEFAULT_LOCALE, type Locale } from '../i18n';
+import { getCatalog } from '../lib/catalog';
+import { shopifyConfig } from '../lib/shopify/storefront';
+import { FORMS, BRAND } from '../data/site';
+
+interface Props {
+  lang: Locale;
+  /** locale-neutral path, e.g. "/shop" */
+  path: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'product' | 'article';
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** false for Spanish-only pages (legal) */
+  hasAlternates?: boolean;
+  transparentHeader?: boolean;
+  bodyClass?: string;
+  mode?: 'editorial' | 'product' | 'functional';
+}
+const {
+  lang, path, title, description, image = '/og-default.jpg', imageAlt = 'HYPSOS', type = 'website',
+  noindex = false, jsonLd, hasAlternates = true, transparentHeader = false, bodyClass = '', mode = 'editorial',
+} = Astro.props;
+
+const t = getDict(lang);
+const catalog = await getCatalog(lang);
+const site = Astro.site!;
+const fullTitle = title ? `${title} — HYPSOS` : `HYPSOS — ${t.meta.tagline}`;
+const desc = description || t.meta.defaultDescription;
+const canonical = new URL(hasAlternates ? lp(lang, path) : path, site).href;
+const ogImage = new URL(image, site).href;
+const sf = shopifyConfig();
+const runtime = {
+  lang,
+  intl: LOCALE_META[lang].intl,
+  shopifyLanguage: LOCALE_META[lang].shopifyLanguage,
+  source: catalog.source,
+  shopify: sf ? { domain: sf.domain, token: sf.token, version: sf.version } : null,
+  base: lp(lang, '/'),
+  paths: { product: lp(lang, '/products/'), search: lp(lang, '/search'), cart: lp(lang, '/cart'), catalog: `/api/catalog-${lang}.json` },
+  forms: FORMS,
+  email: BRAND.email,
+  analytics: (import.meta.env.PUBLIC_ANALYTICS_SRC as string) || '',
+};
+const org = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'HYPSOS',
+  url: site.href,
+  logo: new URL('/icon-512.png', site).href,
+  sameAs: [BRAND.instagram],
+  email: BRAND.email,
+};
+const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
+---
+<!doctype html>
+<html lang={LOCALE_META[lang].htmlLang} class="no-js" data-mode={mode}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={desc} />
+  <link rel="canonical" href={canonical} />
+  {noindex && <meta name="robots" content="noindex, follow" />}
+  {hasAlternates && LOCALES.map((l) => <link rel="alternate" hreflang={LOCALE_META[l].hreflang} href={new URL(lp(l, path), site).href} />)}
+  {hasAlternates && <link rel="alternate" hreflang="x-default" href={new URL(lp(DEFAULT_LOCALE, path), site).href} />}
+  <meta name="theme-color" content="#090303" />
+  <meta name="color-scheme" content="dark" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="sitemap" href="/sitemap.xml" />
+  <link rel="preload" href="/fonts/coolvetica-regular.woff2" as="font" type="font/woff2" crossorigin />
+
+  <meta property="og:site_name" content="HYPSOS" />
+  <meta property="og:type" content={type === 'product' ? 'product' : type} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:alt" content={imageAlt} />
+  <meta property="og:locale" content={LOCALE_META[lang].ogLocale} />
+  {hasAlternates && LOCALES.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={LOCALE_META[l].ogLocale} />)}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={desc} />
+  <meta name="twitter:image" content={ogImage} />
+  {sf && <link rel="preconnect" href={`https://${sf.domain}`} crossorigin />}
+
+  <script is:inline>document.documentElement.classList.replace('no-js','js');</script>
+  <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  <slot name="head" />
+</head>
+<body class={bodyClass}>
+  <a href="#main" class="skip-link">{t.a11y.skip}</a>
+  {catalog.source === 'demo' && <DemoBanner lang={lang} />}
+  <Header lang={lang} catalog={catalog} path={path} transparent={transparentHeader} hasAlternates={hasAlternates} />
+  <main id="main" tabindex="-1">
+    <slot />
+  </main>
+  <Footer lang={lang} path={path} hasAlternates={hasAlternates} />
+  <Overlays lang={lang} catalog={catalog} />
+  <slot name="after" />
+
+  <script type="application/json" id="hypsos-runtime" set:html={JSON.stringify(runtime)} />
+  <script type="application/json" id="hypsos-i18n" set:html={JSON.stringify(clientStrings(lang))} />
+  <script>
+    import '../scripts/app';
+  </script>
+</body>
+</html>

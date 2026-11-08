@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { getDict, localeParams, langFromParam, lp } from '../../i18n';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+---
+<BaseLayout lang={lang} path="/search" title={t.search.title} noindex mode="functional">
+  <PageHead eyebrow="HYPSOS / SEARCH" title={t.search.title} size="section">
+    <form class="sp__form" action={lp(lang, '/search')} method="get" role="search" data-search-page>
+      <label class="sr-only" for="sp-q">{t.search.label}</label>
+      <input class="input sp__input" id="sp-q" name="q" type="search" placeholder={t.search.placeholder} autocomplete="off" />
+      <button class="btn btn--lg" type="submit">{t.search.title} <Icon name="search" class="btn__arrow" /></button>
+    </form>
+  </PageHead>
+  <section class="wrap-full sp" aria-live="polite">
+    <p class="t-label t-muted sp__status" data-sp-status></p>
+    <ul role="list" class="pgrid sp__grid" data-sp-grid></ul>
+    <div class="empty-state" data-sp-empty hidden>
+      <p class="t-h3" data-sp-empty-text></p>
+      <p class="t-body">{t.search.noResultsHint}</p>
+      <a class="btn btn--ghost" href={lp(lang, '/shop')}>{t.nav.all}</a>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .sp__form { display: flex; gap: var(--space-3); margin-top: var(--space-8); max-width: 820px; }
+  .sp__input { min-height: 56px; font-size: var(--fs-lead); }
+  .sp { padding-bottom: var(--section-y); }
+  .sp__status { margin-bottom: var(--space-8); }
+  @media (max-width: 599px) { .sp__form { flex-direction: column; } }
+</style>
+<script>
+  import { loadCatalog } from '../../scripts/commerce/catalog-client';
+  import { searchProducts, resultHTML, rememberSearch } from '../../scripts/commerce/search';
+  import { S, fmt } from '../../scripts/core/runtime';
+  const q = new URL(location.href).searchParams.get('q')?.trim() ?? '';
+  const input = document.getElementById('sp-q') as HTMLInputElement;
+  const grid = document.querySelector('[data-sp-grid]')!;
+  const status = document.querySelector('[data-sp-status]')!;
+  const empty = document.querySelector<HTMLElement>('[data-sp-empty]')!;
+  input.value = q;
+  (async () => {
+    let list = [] as Awaited<ReturnType<typeof loadCatalog>>;
+    try { list = await loadCatalog(); } catch { status.textContent = S.common.error; return; }
+    const res = q ? searchProducts(list, q) : list;
+    if (q) rememberSearch(q);
+    status.textContent = q ? `${fmt(S.search.resultsFor, { q })} — ${res.length}` : `${list.length}`;
+    grid.innerHTML = res.map(resultHTML).join('');
+    empty.hidden = res.length > 0;
+    document.querySelector('[data-sp-empty-text]')!.textContent = fmt(S.search.noResults, { q });
+  })();
+</script>

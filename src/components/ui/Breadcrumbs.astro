@@ -1,0 +1,19 @@
+---
+import { getDict, lp, type Locale } from '../../i18n';
+interface Props { lang: Locale; items: { label: string; href?: string }[] }
+const { lang, items } = Astro.props;
+const t = getDict(lang);
+const site = Astro.site!;
+const all = [{ label: t.nav.home, href: lp(lang, '/') }, ...items];
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: all.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.label, ...(it.href ? { item: new URL(it.href, site).href } : {}) })),
+};
+---
+<nav aria-label={t.a11y.breadcrumbs}>
+  <ol class="crumbs t-label" role="list">
+    {all.map((it, i) => <li>{it.href && i < all.length - 1 ? <a href={it.href}>{it.label}</a> : <span aria-current="page">{it.label}</span>}</li>)}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />

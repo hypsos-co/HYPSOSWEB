@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHead from '../../../components/ui/PageHead.astro';
+import Breadcrumbs from '../../../components/ui/Breadcrumbs.astro';
+import HelpNav from '../../../components/ui/HelpNav.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import { getDict, localeParams, langFromParam, lp } from '../../../i18n';
+import { CONTACT } from '../../../data/help';
+import { BRAND } from '../../../data/site';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+const c = CONTACT[lang];
+---
+<BaseLayout lang={lang} path="/help/contact" title={c.title} description={c.lead} mode="functional">
+  <PageHead eyebrow="HYPSOS / CONTACT" title={c.title} lead={c.lead} size="section">
+    <Breadcrumbs slot="crumbs" lang={lang} items={[{ label: t.nav.help, href: lp(lang, '/help') }, { label: c.title }]} />
+  </PageHead>
+  <section class="help wrap-full">
+    <HelpNav lang={lang} current="contact" />
+    <div class="contact">
+      <form class="contact__form" data-contact novalidate data-msg-success={c.success} data-msg-fallback={c.fallback} data-msg-invalid={c.invalid}>
+        <div class="contact__row">
+          <div class="field"><label class="field__label" for="c-name">{c.name}</label><input class="input" id="c-name" name="name" autocomplete="name" required /></div>
+          <div class="field"><label class="field__label" for="c-email">{c.email}</label><input class="input" id="c-email" name="email" type="email" autocomplete="email" required /></div>
+        </div>
+        <div class="contact__row">
+          <div class="field"><label class="field__label" for="c-topic">{c.topic}</label><select class="select" id="c-topic" name="topic">{c.topics.map((x) => <option>{x}</option>)}</select></div>
+          <div class="field"><label class="field__label" for="c-order">{c.order}</label><input class="input" id="c-order" name="order" /></div>
+        </div>
+        <div class="field"><label class="field__label" for="c-msg">{c.message}</label><textarea class="textarea" id="c-msg" name="message" required rows="6"></textarea></div>
+        <label class="check"><input type="checkbox" name="consent" required /><span>{c.consent} <a class="link-u link-u--on" href="/legal/privacidad" hreflang="es-ES">↗</a></span></label>
+        <p class="t-small contact__msg" data-form-msg role="status" aria-live="polite"></p>
+        <button class="btn btn--lg" type="submit">{c.send} <Icon name="arrow-right" class="btn__arrow" /></button>
+      </form>
+      <aside class="contact__aside">
+        <p class="t-label t-muted">{c.direct}</p>
+        <a class="contact__mail" href={`mailto:${BRAND.email}`}>{BRAND.email}</a>
+        <a class="link-u t-small" href={BRAND.instagram} target="_blank" rel="noopener noreferrer"><Icon name="instagram" size={16} /> {BRAND.instagramHandle}</a>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .help { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); padding-bottom: var(--section-y); }
+  .contact { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: var(--space-12); }
+  .contact__form { display: grid; gap: var(--space-5); }
+  .contact__row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+  .contact__msg:empty { display: none; }
+  .contact__msg { border-left: 2px solid var(--color-crimson); padding-left: var(--space-3); }
+  .contact__form .btn { justify-self: start; }
+  .contact__aside { display: flex; flex-direction: column; gap: var(--space-3); }
+  .contact__mail { font: 400 var(--fs-h4)/1.2 var(--font-display); word-break: break-all; }
+  .contact__aside a { display: inline-flex; gap: var(--space-2); align-items: center; }
+  @media (max-width: 1099px) { .contact { grid-template-columns: 1fr; } }
+  @media (max-width: 899px) { .help { grid-template-columns: 1fr; } }
+  @media (max-width: 599px) { .contact__row { grid-template-columns: 1fr; } }
+</style>

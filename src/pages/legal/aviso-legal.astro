@@ -1,0 +1,29 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+import { BUSINESS, BRAND } from '../../data/site';
+const ph = (s: string) => `<span class="ph">${s}</span>`;
+---
+<LegalLayout slug="aviso-legal" title="Aviso legal" description="Información legal del titular del sitio web HYPSOS.">
+  <h2>1. Datos identificativos</h2>
+  <p>En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se informa:</p>
+  <ul>
+    <li><strong>Titular:</strong> <Fragment set:html={ph(BUSINESS.legalName)} /></li>
+    <li><strong>NIF/CIF:</strong> <Fragment set:html={ph(BUSINESS.taxId)} /></li>
+    <li><strong>Domicilio:</strong> <Fragment set:html={ph(BUSINESS.address)} /></li>
+    <li><strong>Datos registrales:</strong> <Fragment set:html={ph(BUSINESS.registry)} /></li>
+    <li><strong>Email:</strong> <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a></li>
+    <li><strong>Teléfono:</strong> <Fragment set:html={ph(BUSINESS.phone)} /></li>
+  </ul>
+  <h2>2. Objeto</h2>
+  <p>El presente aviso regula el acceso y uso del sitio web <Fragment set:html={ph('[DOMINIO]')} /> (en adelante, el “Sitio”), a través del cual HYPSOS presenta su marca y comercializa prendas de streetwear. La compra de productos se rige además por las <a href="/legal/condiciones-de-compra">Condiciones de compra</a>.</p>
+  <h2>3. Condiciones de uso</h2>
+  <p>El usuario se compromete a hacer un uso adecuado del Sitio conforme a la ley, la buena fe y el presente aviso, y a no emplearlo para actividades ilícitas o que puedan dañar los derechos de HYPSOS o de terceros.</p>
+  <h2>4. Propiedad intelectual e industrial</h2>
+  <p>La marca HYPSOS, sus logotipos (incluida la cruz de HYPSOS), diseños, textos, fotografías, vídeos, código y demás contenidos del Sitio son titularidad de <Fragment set:html={ph(BUSINESS.legalName)} /> o se usan con autorización. Queda prohibida su reproducción, distribución, comunicación pública o transformación sin autorización expresa. <Fragment set:html={ph('[DATOS DE REGISTRO DE MARCA, SI EXISTEN]')} /></p>
+  <h2>5. Responsabilidad</h2>
+  <p>HYPSOS procura que la información del Sitio sea exacta y esté actualizada, pero no garantiza la ausencia de errores ni interrupciones técnicas. HYPSOS no se responsabiliza de los contenidos de sitios de terceros enlazados desde el Sitio.</p>
+  <h2>6. Protección de datos y cookies</h2>
+  <p>Consulta la <a href="/legal/privacidad">Política de privacidad</a> y la <a href="/legal/cookies">Política de cookies</a>.</p>
+  <h2>7. Legislación aplicable y jurisdicción</h2>
+  <p>Este aviso se rige por la legislación española. Para los consumidores, serán competentes los juzgados y tribunales de su domicilio conforme a la normativa de consumo. <Fragment set:html={ph('[ADHESIÓN, EN SU CASO, A UN SISTEMA DE RESOLUCIÓN ALTERNATIVA DE LITIGIOS / JUNTA ARBITRAL DE CONSUMO]')} /></p>
+</LegalLayout>

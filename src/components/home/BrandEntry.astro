@@ -1,0 +1,40 @@
+---
+/** Short brand entry (≤1.6s, once per session, skippable, never blocks keyboard/scroll). */
+import Cross from '../brand/Cross.astro';
+import Wordmark from '../brand/Wordmark.astro';
+import { getDict, type Locale } from '../../i18n';
+interface Props { lang: Locale }
+const t = getDict(Astro.props.lang);
+---
+<script is:inline>
+  (function () {
+    try {
+      var seen = sessionStorage.getItem('hypsos-intro');
+      var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!seen && !rm) document.documentElement.classList.add('intro-on');
+    } catch (e) {}
+  })();
+</script>
+<div class="intro" data-intro aria-hidden="true">
+  <div class="intro__cross"><Cross /></div>
+  <div class="intro__word"><Wordmark decorative /></div>
+  <span class="intro__bar"></span>
+  <button class="intro__skip t-label" type="button" data-intro-skip tabindex="-1">{t.intro.skip}</button>
+</div>
+<style>
+  .intro { display: none; }
+  :global(html.intro-on) .intro {
+    position: fixed; inset: 0; z-index: var(--z-intro); display: grid; place-items: center; align-content: center; gap: var(--space-8);
+    background: var(--color-obsidian); color: var(--color-ice);
+    animation: intro-out .9s var(--ease-expressive) 1.35s forwards;
+  }
+  .intro__cross { width: clamp(56px, 7vw, 92px); color: var(--color-crimson); clip-path: inset(100% 0 0 0); animation: intro-reveal .9s var(--ease-expressive) .05s forwards; }
+  .intro__word { width: clamp(180px, 22vw, 320px); clip-path: inset(0 100% 0 0); animation: intro-wipe 1s var(--ease-expressive) .35s forwards; }
+  .intro__bar { position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: var(--color-crimson); transform: scaleX(0); transform-origin: left; animation: intro-bar 1.3s var(--ease-smooth) forwards; }
+  .intro__skip { position: absolute; right: var(--gutter); bottom: var(--space-8); color: var(--text-muted); padding: var(--space-3); pointer-events: auto; }
+  @keyframes intro-reveal { to { clip-path: inset(0); } }
+  @keyframes intro-wipe { to { clip-path: inset(0); } }
+  @keyframes intro-bar { to { transform: scaleX(1); } }
+  @keyframes intro-out { to { clip-path: inset(0 0 100% 0); visibility: hidden; } }
+  :global(html.intro-done) .intro { display: none !important; }
+</style>

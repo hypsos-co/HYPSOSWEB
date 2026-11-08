@@ -1,0 +1,110 @@
+---
+import Wordmark from '../brand/Wordmark.astro';
+import Cross from '../brand/Cross.astro';
+import { getDict, fmt, lp, LOCALES, LOCALE_META, type Locale } from '../../i18n';
+import { LEGAL_PAGES, HELP_PAGES } from '../../data/site';
+
+interface Props { lang: Locale; path: string; hasAlternates?: boolean }
+const { lang, path, hasAlternates = true } = Astro.props;
+const t = getDict(lang);
+const year = new Date().getFullYear();
+---
+<footer class="ftr grain" data-footer>
+  <div class="ftr__top wrap-full">
+    <div class="ftr__statement">
+      <span class="ftr__cross" aria-hidden="true"><Cross /></span>
+      <p class="t-h3">{t.footer.statement}</p>
+    </div>
+    <div class="ftr__cols">
+      <div class="ftr__col">
+        <p class="t-label t-muted">{t.footer.shop}</p>
+        <ul role="list">
+          <li><a class="link-u" href={lp(lang, '/shop')}>{t.nav.all}</a></li>
+          <li><a class="link-u" href={lp(lang, '/collections/new-arrivals')}>{t.nav.newArrivals}</a></li>
+          <li><a class="link-u" href={lp(lang, '/collections/sweats')}>{t.categories.sweats}</a></li>
+          <li><a class="link-u" href={lp(lang, '/collections/tops')}>{t.categories.tops}</a></li>
+          <li><a class="link-u" href={lp(lang, '/collections/bottoms')}>{t.categories.bottoms}</a></li>
+          <li><a class="link-u" href={lp(lang, '/collections/accessories')}>{t.categories.accessories}</a></li>
+        </ul>
+      </div>
+      <div class="ftr__col">
+        <p class="t-label t-muted">{t.footer.brand}</p>
+        <ul role="list">
+          <li><a class="link-u" href={lp(lang, '/about')}>{t.nav.about}</a></li>
+          <li><a class="link-u" href={lp(lang, '/campaigns')}>{t.nav.campaigns}</a></li>
+          <li><a class="link-u" href={lp(lang, '/lookbook')}>{t.nav.lookbook}</a></li>
+          <li><a class="link-u" href={lp(lang, '/collections')}>{t.nav.collections}</a></li>
+          <li><a class="link-u" href={lp(lang, '/favorites')}>{t.nav.favorites}</a></li>
+          <li><a class="link-u" href={lp(lang, '/account')}>{t.nav.account}</a></li>
+        </ul>
+      </div>
+      <div class="ftr__col">
+        <p class="t-label t-muted">{t.footer.help}</p>
+        <ul role="list">
+          {HELP_PAGES.map((h) => <li><a class="link-u" href={lp(lang, h.path)}>{h.title[lang]}</a></li>)}
+        </ul>
+      </div>
+      <div class="ftr__col">
+        <p class="t-label t-muted">{t.footer.legal}</p>
+        <ul role="list">
+          {LEGAL_PAGES.map((l) => <li><a class="link-u" href={l.path} hreflang="es-ES">{l.title}</a></li>)}
+          <li><button type="button" class="link-u" data-consent-open>{t.footer.cookieSettings}</button></li>
+        </ul>
+        {lang !== 'es' && <p class="t-small t-muted ftr__note">{t.footer.legalSpanishOnly}</p>}
+      </div>
+      <div class="ftr__col">
+        <p class="t-label t-muted">{t.footer.follow}</p>
+        <ul role="list">
+          <li><a class="link-u" href="https://www.instagram.com/hypsos.co" target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
+        </ul>
+        <p class="t-label t-muted ftr__gap">{t.footer.contact}</p>
+        <ul role="list">
+          <li><a class="link-u" href="mailto:hypsos.co@gmail.com">hypsos.co@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="ftr__mark" aria-hidden="true" data-footer-mark>
+    <Wordmark decorative />
+  </div>
+
+  <div class="ftr__bottom wrap-full">
+    <p class="t-label t-muted">{fmt(t.footer.rights, { y: year })}</p>
+    {hasAlternates && (
+      <div class="ftr__lang" role="group" aria-label={t.a11y.language}>
+        {LOCALES.map((l) => (
+          <a class:list={['t-label', { 'is-on': l === lang }]} href={lp(l, path)} hreflang={LOCALE_META[l].hreflang} aria-current={l === lang ? 'true' : undefined}>{LOCALE_META[l].label}</a>
+        ))}
+      </div>
+    )}
+    <p class="t-label t-muted">EUR € · ES</p>
+  </div>
+</footer>
+
+<style>
+  .ftr { position: relative; overflow: hidden; background: var(--color-obsidian); border-top: 1px solid var(--border-subtle); padding-top: clamp(64px, 9vw, 140px); }
+  .ftr__top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--space-16); }
+  .ftr__statement { display: flex; flex-direction: column; gap: var(--space-6); max-width: 16ch; }
+  .ftr__cross { width: 44px; color: var(--color-crimson); }
+  .ftr__cols { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-8); }
+  .ftr__col ul { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-4); font-size: var(--fs-small); color: var(--text-secondary); }
+  .ftr__col a:hover, .ftr__col button:hover { color: var(--text-primary); }
+  .ftr__col button { text-align: left; }
+  .ftr__gap { margin-top: var(--space-8); }
+  .ftr__note { margin-top: var(--space-4); }
+  .ftr__mark { padding: clamp(56px, 8vw, 120px) var(--gutter) 0; color: var(--color-ice); }
+  .ftr__mark :global(svg) { width: 100%; }
+  .ftr__bottom { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-8); justify-content: space-between; align-items: center; padding-top: var(--space-8); padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom)); }
+  .ftr__lang { display: flex; gap: var(--space-5); }
+  .ftr__lang a { color: var(--text-muted); }
+  .ftr__lang a.is-on, .ftr__lang a:hover { color: var(--text-primary); }
+  @media (max-width: 1099px) {
+    .ftr__top { grid-template-columns: 1fr; }
+    .ftr__cols { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--space-10); }
+  }
+  @media (max-width: 599px) {
+    .ftr__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ftr__bottom { flex-direction: column; align-items: flex-start; }
+  }
+</style>

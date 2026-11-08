@@ -1,0 +1,19 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+import { BRAND } from '../../data/site';
+const ph = (s: string) => `<span class="ph">${s}</span>`;
+---
+<LegalLayout slug="devoluciones" title="Devoluciones y reembolsos" description="Procedimiento de devolución y reembolso de HYPSOS.">
+  <h2>1. Solicitud</h2>
+  <p>Escribe a <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a> con tu número de pedido y las prendas que quieres devolver. <Fragment set:html={ph('[PORTAL DE DEVOLUCIONES, SI SE IMPLEMENTA]')} /></p>
+  <h2>2. Envío de la devolución</h2>
+  <p><Fragment set:html={ph('[DIRECCIÓN DE DEVOLUCIÓN, TRANSPORTISTA, ETIQUETA PREPAGADA O NO, COSTE]')} /></p>
+  <h2>3. Estado de los productos</h2>
+  <p><Fragment set:html={ph('[CONDICIONES: sin usar, sin lavar, con etiquetas originales, embalaje]')} />. Ver los efectos de la manipulación en <a href="/legal/desistimiento">Derecho de desistimiento</a>.</p>
+  <h2>4. Reembolso</h2>
+  <p>Reembolsamos por el mismo medio de pago en un plazo máximo de 14 días naturales desde la comunicación del desistimiento, pudiendo retenerlo hasta recibir los productos o la prueba de su envío.</p>
+  <h2>5. Cambios</h2>
+  <p><Fragment set:html={ph('[POLÍTICA DE CAMBIOS DE TALLA / COLOR, SI SE OFRECE]')} /></p>
+  <h2>6. Productos defectuosos</h2>
+  <p>Si recibes un producto defectuoso o que no corresponde con tu pedido, consulta las <a href="/legal/garantias">Garantías legales</a> y escríbenos.</p>
+</LegalLayout>

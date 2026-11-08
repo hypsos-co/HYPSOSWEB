@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHead from '../../../components/ui/PageHead.astro';
+import Breadcrumbs from '../../../components/ui/Breadcrumbs.astro';
+import HelpNav from '../../../components/ui/HelpNav.astro';
+import { getDict, localeParams, langFromParam, lp } from '../../../i18n';
+import { FAQ, HELP_INTRO } from '../../../data/help';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+const intro = HELP_INTRO[lang];
+const faq = FAQ[lang];
+const ld = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.flatMap((g) => g.items.filter((i) => !i.a.includes('[')).map((i) => ({ '@type': 'Question', name: i.q, acceptedAnswer: { '@type': 'Answer', text: i.a } }))) };
+---
+<BaseLayout lang={lang} path="/help" title={intro.title} description={intro.lead} jsonLd={ld} mode="functional">
+  <PageHead eyebrow="HYPSOS / HELP" title={intro.title} lead={intro.lead} size="section">
+    <Breadcrumbs slot="crumbs" lang={lang} items={[{ label: t.nav.help }]} />
+  </PageHead>
+  <section class="help wrap-full">
+    <HelpNav lang={lang} current="faq" />
+    <div class="help__main">
+      {faq.map((g) => (
+        <div class="help__group">
+          <h2 class="t-label t-muted">{g.group}</h2>
+          <div class="acc">
+            {g.items.map((it) => (
+              <details>
+                <summary>{it.q}<span class="acc__icon" aria-hidden="true"></span></summary>
+                <div class="acc__body"><p set:html={it.a.replace(/\[([^\]]+)\]/g, '<span class="ph">[$1]</span>')} /></div>
+              </details>
+            ))}
+          </div>
+        </div>
+      ))}
+      <p class="t-body">→ <a class="link-u link-u--on" href={lp(lang, '/help/contact')}>hypsos.co@gmail.com</a></p>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .help { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); padding-bottom: var(--section-y); }
+  .help__main { display: grid; gap: var(--space-12); max-width: 820px; }
+  .help__group { display: grid; gap: var(--space-4); }
+  @media (max-width: 899px) { .help { grid-template-columns: 1fr; } }
+</style>

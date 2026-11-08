@@ -1,0 +1,62 @@
+---
+import Icon from '../ui/Icon.astro';
+import Price from '../ui/Price.astro';
+import { getDict, fmt, lp, type Locale } from '../../i18n';
+import type { Product } from '../../lib/types';
+import { imageForColor } from '../../lib/catalog';
+
+interface Props { product: Product; lang: Locale; eager?: boolean; color?: string | null; sizes?: string; index?: number; reveal?: boolean }
+const { product: p, lang, eager = false, color = null, sizes = '(min-width: 1100px) 25vw, (min-width: 750px) 33vw, 50vw', index = 0, reveal = true } = Astro.props;
+const t = getDict(lang);
+const colorOpt = p.options.find((o) => o.key === 'color');
+const sizeOpt = p.options.find((o) => o.key === 'size');
+const activeColor = color ?? colorOpt?.values[0] ?? null;
+const front = imageForColor(p, activeColor, 'front');
+const back = imageForColor(p, activeColor, 'back');
+const ci = colorOpt ? p.options.indexOf(colorOpt) : -1;
+const si = sizeOpt ? p.options.indexOf(sizeOpt) : -1;
+const variants = p.variants.filter((v) => ci < 0 || v.options[ci]?.value === activeColor);
+const sizeList = si >= 0 ? variants.map((v) => ({ size: v.options[si].value, v })) : variants.map((v) => ({ size: v.title, v }));
+const oneSize = sizeList.length === 1;
+const lowStock = p.available && variants.some((v) => v.available && v.quantityAvailable != null && v.quantityAvailable <= 3);
+const qaId = `qa-${p.handle}-${index}`;
+const url = lp(lang, `/products/${p.handle}`) + (activeColor && colorOpt && colorOpt.values.length > 1 ? `?color=${encodeURIComponent(activeColor)}` : '');
+---
+<article class:list={['pcard', { 'is-soldout': !p.available }]} data-card={p.handle} data-reveal={reveal ? 'fade' : undefined} style={`--d:${(index % 4) * 0.08}s`}>
+  <div class="pcard__stage">
+  <a class="pcard__link" href={url} data-cursor="view" aria-label={`${p.title} — ${activeColor ?? ''}`}>
+    <div class="pcard__media plinth">
+      {front && <img class="pcard__img" src={front.src} srcset={front.srcset} sizes={sizes} width={front.width} height={front.height} alt={front.alt} loading={eager ? 'eager' : 'lazy'} decoding="async" fetchpriority={eager ? 'high' : undefined} />}
+      {back && back !== front && <img class="pcard__img pcard__img--alt" src={back.src} srcset={back.srcset} sizes={sizes} width={back.width} height={back.height} alt="" aria-hidden="true" loading="lazy" decoding="async" />}
+      <span class="pcard__badges">
+        {p.isNew && <span class="badge">{t.common.new}</span>}
+        {!p.available && <span class="badge badge--outline">{t.common.soldOut}</span>}
+        {lowStock && <span class="badge badge--outline">{t.common.lowStock}</span>}
+      </span>
+    </div>
+  </a>
+  <button class="pcard__fav icon-btn" type="button" data-fav={p.handle} aria-pressed="false" aria-label={t.common.addFav}><Icon name="heart" size={18} /></button>
+  {p.available && (
+    <>
+      <button class="pcard__qa-toggle" type="button" data-qa-toggle aria-expanded="false" aria-controls={qaId} data-cursor="add">
+        <Icon name="plus" size={16} /><span class="t-label">{t.common.quickAdd}</span>
+      </button>
+      <div class="pcard__qa" id={qaId} role="group" aria-label={`${t.common.selectSize} — ${p.title}`}>
+        {sizeList.map(({ size, v }) => (
+          <button type="button" class:list={['chip', { 'is-unavailable': !v.available }]} data-qa-variant={v.id} data-handle={p.handle} disabled={!v.available} aria-label={`${t.common.addToBag}: ${p.title}, ${size}${!v.available ? ` (${t.common.soldOut})` : ''}`}>{size}</button>
+        ))}
+      </div>
+    </>
+  )}
+  </div>
+  <div class="pcard__info">
+    <div class="pcard__row">
+      <a class="pcard__title" href={url}>{p.title}</a>
+      <Price amount={p.priceRange.min.amount} lang={lang} currency={p.priceRange.min.currencyCode} from={p.priceRange.max.amount > p.priceRange.min.amount ? t.common.from : null} />
+    </div>
+    <div class="pcard__row pcard__meta t-small t-muted">
+      <span>{p.productType}{colorOpt ? ` · ${colorOpt.values.join(' / ')}` : ''}</span>
+      {!oneSize && <span class="pcard__sizes" aria-label={t.common.size}>{sizeList.map(({ size, v }) => <span class:list={{ 'is-out': !v.available }}>{size}</span>)}</span>}
+    </div>
+  </div>
+</article>

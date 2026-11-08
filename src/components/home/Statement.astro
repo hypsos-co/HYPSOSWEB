@@ -1,0 +1,30 @@
+---
+import { getDict, type Locale } from '../../i18n';
+interface Props { lang: Locale }
+const t = getDict(Astro.props.lang).home.statement;
+---
+<section class="stmt surface-ice" data-statement aria-label={t.lines.join(' ')}>
+  <div class="stmt__inner wrap-full">
+    <p class="t-label stmt__eyebrow" data-reveal="fade">{t.eyebrow}</p>
+    <h2 class="stmt__lines" aria-hidden="true">
+      {t.lines.map((l, i) => <span class:list={['stmt__line', `stmt__line--${i}`, { 't-crimson': i === t.lines.length - 1 }]} data-st-line data-dir={i % 2 ? 1 : -1}>{l}</span>)}
+    </h2>
+    <div class="stmt__body">
+      <span class="stmt__num t-label">001</span>
+      <p class="t-lead" data-reveal="fade">{t.body}</p>
+    </div>
+  </div>
+</section>
+<style>
+  .stmt { position: relative; overflow: hidden; padding-block: clamp(96px, 14vw, 220px); }
+  .stmt__inner { display: grid; gap: clamp(32px, 5vw, 72px); }
+  .stmt__eyebrow { color: var(--text-muted); }
+  .stmt__lines { display: flex; flex-direction: column; font: 400 clamp(4.5rem, 16vw, 18rem)/.82 var(--font-display); letter-spacing: -0.055em; margin: 0; }
+  .stmt__line { display: block; white-space: nowrap; will-change: transform; }
+  .stmt__line--1 { padding-left: 14vw; }
+  .stmt__line--2 { text-align: right; }
+  .stmt__body { display: grid; grid-template-columns: 1fr minmax(0, 520px); gap: var(--space-8); align-items: start; }
+  .stmt__body .t-lead { color: var(--obsidian-72); }
+  .stmt__num { color: var(--color-crimson); }
+  @media (max-width: 749px) { .stmt__body { grid-template-columns: 1fr; } .stmt__line--1 { padding-left: 8vw; } }
+</style>

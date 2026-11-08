@@ -1,0 +1,229 @@
+---
+/**
+ * <runway-section> — "Try the look". Behaviour: src/scripts/sections/runway.ts. Styles: src/styles/runway.css.
+ * Looks come from src/data/looks.ts (replace ghost-outfit figures with model cut-outs there).
+ */
+import '../../styles/runway.css';
+import { getDict, fmt, lp, formatMoney, type Locale } from '../../i18n';
+import type { Catalog } from '../../lib/types';
+import { getLooks } from '../../data/looks';
+import { imageForColor } from '../../lib/catalog';
+import { pickSrc } from '../../lib/img';
+
+interface Props { lang: Locale; catalog: Catalog; id?: string }
+const { lang, catalog, id = 'runway' } = Astro.props;
+const t = getDict(lang).runway;
+const tc = getDict(lang).common;
+const looks = getLooks(lang, catalog);
+const pad = (n: number) => String(n).padStart(2, '0');
+
+function piecesFor(li: number) {
+  const look = looks[li];
+  return look.pieces.map((piece, pi) => {
+    const p = look.products[pi];
+    const colorOpt = p.options.find((o) => o.key === 'color');
+    const sizeOpt = p.options.find((o) => o.key === 'size');
+    const ci = colorOpt ? p.options.indexOf(colorOpt) : -1;
+    const si = sizeOpt ? p.options.indexOf(sizeOpt) : -1;
+    const color = piece.color ?? colorOpt?.values[0] ?? null;
+    const vs = p.variants.filter((v) => ci < 0 || v.options[ci]?.value === color);
+    const variants = vs.map((v) => ({ id: v.id, a: v.available, q: v.quantityAvailable, o: [si >= 0 ? v.options[si].value : v.title], p: v.price.amount }));
+    const img = imageForColor(p, color, 'front');
+    const single = variants.length === 1 ? variants[0] : null;
+    const firstAvail = variants.find((v) => v.a);
+    return {
+      n: pi + 1, p, color, img, variants, single, firstAvail,
+      price: vs[0]?.price.amount ?? p.priceRange.min.amount,
+      soldOut: !variants.some((v) => v.a),
+      sizeName: sizeOpt?.name ?? tc.size,
+      optNames: p.options.map((o) => o.name),
+      ci, si,
+      pin: piece.pin, isNew: piece.isNew,
+    };
+  });
+}
+const lookData = looks.map((l, i) => ({ look: l, pieces: piecesFor(i) }));
+const sizesAttr = '(min-width: 1800px) 540px, (min-width: 750px) 420px, 320px';
+---
+<runway-section
+  id={id}
+  class="rw rw--popup"
+  data-autoplay="true"
+  data-speed="5000"
+  data-style="ring"
+  data-mstyle="classic"
+  data-msg-choose={t.pickSizeFor}
+  data-msg-error={t.error}
+  data-word={t.look}
+>
+  <div class="rw__sticky">
+    <div class="rw__grid">
+      <div class="rw__left">
+        <div class="rw__head">
+          <div class="rw__intro">
+            <p class="rw__eyebrow">{t.eyebrow}</p>
+            <h2 class="rw__title">{t.title}</h2>
+            <p class="rw__sub">{t.sub}</p>
+          </div>
+          {!looks.some((l) => l.probe) && <p class="rw__note">{t.placeholderNote}</p>}
+          <span class="rw__sr" aria-live="polite" aria-atomic="true" data-rw-live></span>
+        </div>
+
+        <div class="rw__stage" data-rw-stage tabindex="0" role="region" aria-roledescription="carousel" aria-label={t.region}>
+          <div class="rw__actors" data-rw-actors>
+            {looks.map((l, i) => (
+              <div class="rw__model" data-rw-model data-index={i} aria-hidden="true">
+                <span class="rw__shadow"></span>
+                <div class="rw__figure" style="--rw-ar:0.5625">
+                  <div class="rw__art">
+                    <img src={l.image640} srcset={`${l.image640} 640w, ${l.image1080} 1080w`} sizes={sizesAttr} loading="eager" decoding="async" width="1080" height="1920" draggable="false" data-model-image alt={l.name} />
+                    <button class="rw__hit" type="button" data-rw-go={i} aria-label={fmt(t.lookN, { n: pad(i + 1), name: l.name })} tabindex="-1"></button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div class="rw__heroes" data-rw-heroes>
+            {lookData.map(({ look: l, pieces }, i) => (
+              <div class:list={['rw__hero', { 'is-on': i === 0 }]} data-rw-hero data-index={i} data-name={l.name} data-label={fmt(t.lookN, { n: pad(i + 1), name: l.name })} data-probe={l.probe ? l.image640 : undefined} aria-hidden={i === 0 ? 'false' : 'true'}>
+                <div class="rw__morph">
+                  <span class="rw__shadow"></span>
+                  <div class="rw__figure" style="--rw-ar:0.5625">
+                    <div class="rw__art">
+                      <img src={l.image640} srcset={`${l.image640} 640w, ${l.image1080} 1080w`} sizes={sizesAttr} loading="eager" decoding="async" width="1080" height="1920" draggable="false" data-model-image alt={l.name} />
+                      <button class="rw__zoom" type="button" data-rw-zoom aria-label={`${t.viewLook}: ${l.name}`} tabindex={i === 0 ? 0 : -1}></button>
+                      <div class="rw__pins">
+                        {pieces.map((pc) => (
+                          <button class="rw__pin" type="button" data-rw-pin={pc.n} data-tip={pc.p.title} style={`left:${pc.pin[0]}%;top:${pc.pin[1]}%;--pi:${pc.n}`} aria-label={`${pc.n}: ${pc.p.title}`} tabindex="-1"><span class="rw__pin-dot">{pc.n}</span></button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <span class="rw__sweep"></span>
+          <span class="rw__cursor" data-rw-cursor aria-hidden="true"><span class="rw__cursor-in"><span class="rw__cursor-label rw__cursor-drag">{t.drag}</span><span class="rw__cursor-label rw__cursor-view">{t.view}</span></span></span>
+          <span class="rw__walk" aria-hidden="true"><span class="rw__walk-line"></span></span>
+        </div>
+
+        <div class="rw__controls">
+          <button class="rw__icon" type="button" data-rw-prev aria-label={t.prev}>
+            <svg width="26" height="14" viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M25 7H1M7 1L1 7l6 6"/></svg>
+          </button>
+          <div class="rw__ticks">
+            {looks.map((l, i) => (
+              <button class:list={['rw__tick']} type="button" data-rw-tick={i} aria-current={i === 0 ? 'true' : 'false'} aria-label={fmt(t.lookN, { n: pad(i + 1), name: l.name })}>
+                <span class="rw__tick-bar"></span>
+                <span class="rw__tick-label">{pad(i + 1)}<span class="rw__tick-name">&nbsp;&nbsp;{l.name}</span></span>
+              </button>
+            ))}
+          </div>
+          <button class="rw__icon rw__auto" type="button" data-rw-auto aria-pressed="false" aria-label={t.autoplay}>
+            <svg class="rw__i-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg>
+            <svg class="rw__i-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.5 4.5h3.5v15H6.5zM14 4.5h3.5v15H14z"/></svg>
+          </button>
+          <button class="rw__icon" type="button" data-rw-next aria-label={t.next}>
+            <svg width="26" height="14" viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 7h24M19 1l6 6-6 6"/></svg>
+          </button>
+        </div>
+
+        <div class="rw__lb" data-rw-lb role="region" aria-label={t.viewLook} aria-hidden="true">
+          <div class="rw__lb-stage" data-rw-lb-stage></div>
+          <div class="rw__lb-top">
+            <p class="rw__lb-cap"><span class="rw__lb-kicker" data-rw-lb-kicker></span><span class="rw__lb-name" data-rw-lb-name></span></p>
+            <button class="rw__lb-close" type="button" data-rw-zoom-close aria-label={tc.close}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+            </button>
+          </div>
+          <p class="rw__lb-hint">{t.tapDot}</p>
+        </div>
+      </div>
+
+      <div class="rw__panel">
+        <div class="rw__panel-inner">
+          <div class="rw__panel-head">
+            <h3 class="rw__panel-title">{t.inThisLook}</h3>
+            <span class="rw__label" data-rw-pieces>{fmt(t.pieces, { n: lookData[0]?.pieces.length ?? 0 })}</span>
+          </div>
+          {lookData.map(({ look: l, pieces }, li) => {
+            const total = pieces.reduce((a, pc) => a + pc.price, 0);
+            return (
+              <div class:list={['rw__look-panel', { 'is-in': li === 0 }]} data-rw-panel={li} hidden={li !== 0}>
+                <div class="rw__mhead"><span class="rw__mhead-title">{pad(li + 1)} — {l.name}</span><span class="rw__label">{fmt(t.pieces, { n: pieces.length })}</span></div>
+                <ul class="rw__items" role="list">
+                  {pieces.map((pc) => {
+                    const pickerId = `Picker-${id}-${l.key}-${pc.n}`;
+                    const url = lp(lang, `/products/${pc.p.handle}`) + (pc.color ? `?color=${encodeURIComponent(pc.color)}` : '');
+                    return (
+                      <li class="rw__item" data-rw-card={pc.n} style={`--i:${pc.n}`} data-title={pc.p.title} data-handle={pc.p.handle} data-color={pc.color ?? ''} data-currency={pc.p.priceRange.min.currencyCode} data-image={pickSrc(pc.img, 480)} data-option-names={JSON.stringify(pc.optNames)} data-ci={pc.ci} data-si={pc.si} data-variant-id={pc.single && pc.single.a ? pc.single.id : undefined} data-soldout={pc.soldOut ? 'true' : undefined}>
+                        {pc.isNew && <span class="rw__tag"><span class="rw__tag-text">{tc.new}</span></span>}
+                        <a class="rw__media" href={url} tabindex="-1" aria-hidden="true">
+                          {pc.img && <img src={pickSrc(pc.img, 480)} width="480" height="600" loading="lazy" decoding="async" alt="" />}
+                          <span class="rw__num">{pc.n}</span>
+                        </a>
+                        <div class="rw__info">
+                          <span class="rw__type">{pc.p.productType}{pc.color ? ` · ${pc.color}` : ''}</span>
+                          <a class="rw__name" href={url}>{pc.p.title}</a>
+                          <span class="rw__price"><span>{pc.soldOut ? tc.soldOut : formatMoney(pc.price, lang, pc.p.priceRange.min.currencyCode)}</span></span>
+                        </div>
+                        <button class="rw__add" type="button" data-rw-add aria-expanded={pc.single ? undefined : 'false'} aria-controls={pc.single ? undefined : pickerId} aria-label={fmt(t.addPiece, { name: pc.p.title })} data-added-label={fmt(t.addedPiece, { name: pc.p.title })} disabled={pc.soldOut}>
+                          <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg>
+                          <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                          <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                        </button>
+                        {!pc.single && (
+                          <div class="rw__picker" id={pickerId} data-rw-picker hidden>
+                            <div class="rw__picker-head">
+                              {pc.img && <img src={pickSrc(pc.img, 480)} width="160" height="200" alt="" loading="lazy" decoding="async" />}
+                              <div><span class="rw__picker-title">{pc.p.title}</span><span class="rw__picker-price">{formatMoney(pc.price, lang, pc.p.priceRange.min.currencyCode)}{pc.color ? ` · ${pc.color}` : ''}</span></div>
+                              <button class="rw__pick-close" type="button" data-rw-pick-close aria-label={tc.close}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+                            </div>
+                            <fieldset class="rw__opt">
+                              <legend class="rw__opt-name">{pc.sizeName}</legend>
+                              <div class="rw__values">
+                                {pc.variants.map((v) => (
+                                  <label class:list={['rw__pill', { 'is-unavailable': !v.a }]}>
+                                    <input type="radio" name={`Opt-${id}-${l.key}-${pc.n}`} value={v.o[0]} data-rw-option="0" checked={pc.firstAvail?.id === v.id} />
+                                    <span class="rw__pill-label">{v.o[0]}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            </fieldset>
+                            <button class="rw__confirm" type="button" data-rw-confirm><span data-rw-confirm-label data-add={tc.addToBag} data-soldout={tc.soldOut}>{tc.addToBag}</span><span class="rw__sr"> — {pc.p.title}</span></button>
+                            <script type="application/json" data-rw-variants set:html={JSON.stringify(pc.variants)} />
+                          </div>
+                        )}
+                        {pc.single && <script type="application/json" data-rw-variants set:html={JSON.stringify(pc.variants)} />}
+                      </li>
+                    );
+                  })}
+                </ul>
+                <div class="rw__bundle">
+                  <p class="rw__msg" data-rw-msg role="status" aria-live="polite"></p>
+                  <div class="rw__bundle-row">
+                    <div class="rw__bundle-copy"><span class="rw__bundle-title">{t.completeTitle}</span><span class="rw__bundle-note">{fmt(t.completeNote, { n: pieces.length })}</span></div>
+                    <span class="rw__bundle-price"><strong>{formatMoney(total, lang)}</strong></span>
+                  </div>
+                  <button class="rw__cta" type="button" data-rw-all>
+                    <span class="rw__cta-add">{t.addFull}</span>
+                    <span class="rw__cta-m">{fmt(t.addFullMobile, { p: formatMoney(total, lang) })}</span>
+                    <span class="rw__cta-done">{t.fullDone}</span>
+                    <svg class="rw__i-arrow" width="22" height="12" viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 7h24M19 1l6 6-6 6"/></svg>
+                    <svg class="rw__i-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                  </button>
+                </div>
+                <template data-rw-pieces-text>{fmt(t.pieces, { n: pieces.length })}</template>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  </div>
+</runway-section>
+
+<script>
+  import '../../scripts/sections/runway';
+</script>

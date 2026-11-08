@@ -1,0 +1,23 @@
+---
+import { getDict, type Locale } from '../../i18n';
+interface Props { lang: Locale }
+const t = getDict(Astro.props.lang);
+---
+<div class="demo-pill" data-demo-pill>
+  <button type="button" class="demo-pill__btn" aria-expanded="false" aria-controls="demo-note" onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') !== 'true')">
+    <span class="badge">{t.demo.short}</span>
+  </button>
+  <p id="demo-note" class="demo-pill__note" role="note">{t.demo.banner}</p>
+</div>
+<style>
+  .demo-pill { position: fixed; z-index: calc(var(--z-header) - 3); left: var(--space-4); bottom: var(--space-4); display: flex; align-items: flex-end; gap: var(--space-2); transition: opacity .4s, transform .6s var(--ease-standard); }
+  .demo-pill__btn { display: inline-flex; padding: 4px; border-radius: var(--radius-xs); }
+  .demo-pill__note {
+    max-width: min(320px, calc(100vw - 96px)); padding: var(--space-2) var(--space-3);
+    background: var(--obsidian-90); border: 1px solid var(--border-subtle); color: var(--text-secondary);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-size: var(--fs-micro); line-height: 1.4;
+    opacity: 0; transform: translateX(-6px); pointer-events: none; transition: opacity .3s, transform .5s var(--ease-standard);
+  }
+  .demo-pill:hover .demo-pill__note, .demo-pill__btn[aria-expanded="true"] + .demo-pill__note, .demo-pill__btn:focus-visible + .demo-pill__note { opacity: 1; transform: none; }
+  :global(html.is-scrolled-far) .demo-pill, :global(html.has-consent-open) .demo-pill, :global(html.is-locked) .demo-pill { opacity: 0; transform: translateY(8px); pointer-events: none; }
+</style>

@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { getDict, localeParams, langFromParam, lp, formatMoney } from '../../i18n';
+import { getCatalog } from '../../lib/catalog';
+import { getLooks } from '../../data/looks';
+import { LOOKBOOK } from '../../data/brand';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+const lb = LOOKBOOK[lang];
+const catalog = await getCatalog(lang);
+const looks = getLooks(lang, catalog);
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<BaseLayout lang={lang} path="/lookbook" title={lb.title} description={lb.lead}>
+  <PageHead eyebrow="HYPSOS / LOOKBOOK — COLLECTION 001" title={lb.title} lead={lb.lead}>
+    <Breadcrumbs slot="crumbs" lang={lang} items={[{ label: lb.title }]} />
+    <p class="notice lbk__note"><span class="badge badge--ice">001</span><span>{lb.note}</span></p>
+  </PageHead>
+  <section class="wrap-full lbk">
+    {looks.map((l, i) => (
+      <article class:list={['lbk__look', { 'lbk__look--alt': i % 2 === 1 }]}>
+        <div class="lbk__fig plinth" data-reveal="mask">
+          <img src={l.image1080} srcset={`${l.image640} 640w, ${l.image1080} 1080w`} sizes="(min-width: 900px) 40vw, 90vw" width="1080" height="1920" alt={`Look ${pad(i + 1)} — ${l.name}`} loading={i < 2 ? 'eager' : 'lazy'} decoding="async" />
+          <span class="lbk__num" aria-hidden="true">{pad(i + 1)}</span>
+        </div>
+        <div class="lbk__info">
+          <p class="t-label t-muted">LOOK {pad(i + 1)}</p>
+          <h2 class="t-section" data-split>{l.name}</h2>
+          <ol class="lbk__pieces" role="list">
+            {l.products.map((p, j) => (
+              <li><a class="link-u" href={lp(lang, `/products/${p.handle}`) + (l.pieces[j].color ? `?color=${encodeURIComponent(l.pieces[j].color!)}` : '')}><span class="t-label t-crimson">{j + 1}</span> {p.title}{l.pieces[j].color ? ` — ${l.pieces[j].color}` : ''}</a><span class="t-small t-muted">{formatMoney(p.priceRange.min.amount, lang)}</span></li>
+            ))}
+          </ol>
+          <a class="btn btn--ghost" href={lp(lang, '/#runway')}>{lb.shop} <Icon name="arrow-right" class="btn__arrow" /></a>
+        </div>
+      </article>
+    ))}
+  </section>
+</BaseLayout>
+<style>
+  .lbk__note { margin-top: var(--space-8); max-width: 640px; }
+  .lbk { display: grid; gap: clamp(64px, 10vw, 160px); padding-bottom: var(--section-y); }
+  .lbk__look { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 4fr); gap: clamp(32px, 6vw, 120px); align-items: center; }
+  .lbk__look--alt .lbk__fig { order: 2; }
+  .lbk__fig { position: relative; aspect-ratio: 3/4; overflow: hidden; }
+  .lbk__fig img { position: absolute; left: 50%; bottom: 3%; height: 94%; width: auto; transform: translateX(-50%); }
+  .lbk__num { position: absolute; left: var(--space-5); top: var(--space-3); font: 400 clamp(3rem, 7vw, 7rem)/1 var(--font-display); letter-spacing: -0.05em; color: var(--obsidian-14); }
+  .lbk__info { display: grid; gap: var(--space-6); align-content: center; }
+  .lbk__pieces { display: grid; gap: var(--space-3); padding: 0; margin: 0; }
+  .lbk__pieces li { display: flex; justify-content: space-between; gap: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--border-subtle); }
+  .lbk__info .btn { justify-self: start; }
+  @media (max-width: 899px) { .lbk__look { grid-template-columns: 1fr; } .lbk__look--alt .lbk__fig { order: 0; } }
+</style>

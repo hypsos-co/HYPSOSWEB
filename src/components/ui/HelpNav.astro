@@ -1,0 +1,18 @@
+---
+import { lp, type Locale } from '../../i18n';
+import { HELP_PAGES } from '../../data/site';
+interface Props { lang: Locale; current: string }
+const { lang, current } = Astro.props;
+---
+<nav class="hnav" aria-label="Help">
+  <ul role="list">
+    {HELP_PAGES.map((h) => <li><a class:list={['hnav__a', { 'is-on': h.slug === current }]} href={lp(lang, h.path)} aria-current={h.slug === current ? 'page' : undefined}>{h.title[lang]}</a></li>)}
+  </ul>
+</nav>
+<style>
+  .hnav ul { display: flex; flex-direction: column; gap: 2px; position: sticky; top: calc(var(--header-h) + 24px); }
+  .hnav__a { display: block; padding: var(--space-2) 0 var(--space-2) var(--space-4); border-left: 1px solid var(--border-subtle); color: var(--text-muted); font-size: var(--fs-small); transition: color .3s, border-color .3s; }
+  .hnav__a:hover { color: var(--text-primary); }
+  .hnav__a.is-on { color: var(--text-primary); border-left-color: var(--color-crimson); }
+  @media (max-width: 899px) { .hnav ul { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--space-2); } .hnav__a { border: 1px solid var(--border-subtle); border-radius: var(--radius-pill); padding: var(--space-2) var(--space-4); } .hnav__a.is-on { border-color: var(--color-crimson); } }
+</style>

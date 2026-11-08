@@ -1,0 +1,27 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+import { BUSINESS, BRAND } from '../../data/site';
+const ph = (s: string) => `<span class="ph">${s}</span>`;
+---
+<LegalLayout slug="desistimiento" title="Derecho de desistimiento" description="Cómo ejercer el derecho de desistimiento de 14 días naturales.">
+  <h2>1. Plazo</h2>
+  <p>Tienes derecho a desistir del contrato en un plazo de <strong>14 días naturales</strong> sin necesidad de justificación. El plazo expira a los 14 días naturales del día en que tú o un tercero indicado por ti, distinto del transportista, adquiráis la posesión material de los bienes (arts. 102 a 108 del Real Decreto Legislativo 1/2007).</p>
+  <h2>2. Cómo ejercerlo</h2>
+  <p>Debes notificarnos tu decisión mediante una declaración inequívoca (por ejemplo, un email a <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a> o una carta a <Fragment set:html={ph(BUSINESS.address)} />). Puedes utilizar el modelo de formulario incluido abajo, aunque no es obligatorio. Para cumplir el plazo basta con que la comunicación se envíe antes de que venza.</p>
+  <h2>3. Consecuencias</h2>
+  <p>Te devolveremos todos los pagos recibidos, incluidos los gastos de entrega (salvo los costes adicionales si elegiste una modalidad de entrega distinta a la menos costosa ofrecida), sin demora indebida y, en todo caso, a más tardar 14 días naturales a partir de la fecha en que se nos informe de tu decisión. Usaremos el mismo medio de pago empleado en la transacción inicial, salvo que acuerdes expresamente otro, sin coste para ti. Podremos retener el reembolso hasta haber recibido los bienes o hasta que presentes una prueba de su devolución, según qué condición se cumpla primero.</p>
+  <p>Deberás devolver los bienes sin demora indebida y, en cualquier caso, a más tardar en 14 días naturales desde que nos comuniques el desistimiento. <Fragment set:html={ph('[INDICAR: el consumidor asume / HYPSOS asume el coste directo de devolución]')} />. Solo serás responsable de la disminución de valor de los bienes resultante de una manipulación distinta a la necesaria para establecer su naturaleza, características y funcionamiento.</p>
+  <h2>4. Excepciones</h2>
+  <p>No aplica, entre otros supuestos del art. 103, a bienes confeccionados conforme a las especificaciones del consumidor o claramente personalizados. <Fragment set:html={ph('[REVISAR SI ALGÚN PRODUCTO HYPSOS ENTRA EN ALGUNA EXCEPCIÓN]')} /></p>
+  <h2>5. Modelo de formulario de desistimiento</h2>
+  <p><em>(Solo debe cumplimentar y enviar el presente formulario si desea desistir del contrato.)</em></p>
+  <blockquote>
+    <p>A la atención de <Fragment set:html={ph(BUSINESS.legalName)} />, <Fragment set:html={ph(BUSINESS.address)} />, {BRAND.email}:</p>
+    <p>Por la presente le comunico que desisto de mi contrato de venta del siguiente bien: ____________</p>
+    <p>Pedido el / recibido el: ____________</p>
+    <p>Nombre del consumidor: ____________</p>
+    <p>Domicilio del consumidor: ____________</p>
+    <p>Firma del consumidor (solo si el formulario se presenta en papel): ____________</p>
+    <p>Fecha: ____________</p>
+  </blockquote>
+</LegalLayout>

@@ -1,0 +1,15 @@
+---
+import { formatMoney, type Locale } from '../../i18n/config';
+interface Props { amount: number; compareAt?: number | null; lang: Locale; from?: string | null; class?: string; currency?: string }
+const { amount, compareAt = null, lang, from = null, class: cls = '', currency = 'EUR' } = Astro.props;
+---
+<span class={`price ${cls}`}>
+  {from && <span class="price__from">{from} </span>}
+  {compareAt && compareAt > amount && <s class="price__compare">{formatMoney(compareAt, lang, currency)}</s>}
+  <span class="price__amount">{formatMoney(amount, lang, currency)}</span>
+</span>
+<style>
+  .price { display: inline-flex; gap: .5em; align-items: baseline; font-variant-numeric: tabular-nums; }
+  .price__compare { color: var(--text-muted); font-size: .9em; }
+  .price__from { color: var(--text-muted); }
+</style>

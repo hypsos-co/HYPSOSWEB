@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import Cross from '../../components/brand/Cross.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { getDict, localeParams, langFromParam, lp } from '../../i18n';
+import { CAMPAIGNS } from '../../data/brand';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+const c = CAMPAIGNS[lang];
+---
+<BaseLayout lang={lang} path="/campaigns" title={c.title} description={c.lead}>
+  <PageHead eyebrow="HYPSOS / CAMPAIGNS" title={c.title} lead={c.lead}>
+    <Breadcrumbs slot="crumbs" lang={lang} items={[{ label: c.title }]} />
+  </PageHead>
+  <section class="wrap-full camp">
+    {c.items.map((it) => (
+      <article class="camp__item">
+        <div class="camp__frame" data-reveal="scale">
+          <div class="camp__cross" aria-hidden="true"><Cross /></div>
+          <span class="camp__n">{it.n}</span>
+          <span class="camp__status t-label"><span class="camp__dot"></span>{it.status}</span>
+        </div>
+        <div class="camp__text">
+          <p class="t-label t-muted">CAMPAIGN {it.n}</p>
+          <h2 class="t-section" data-split>{it.title}</h2>
+          <p class="t-lead">{it.text}</p>
+          <div class="cluster">
+            <a class="btn" href={lp(lang, '/lookbook')}>{c.lookbook} <Icon name="arrow-right" class="btn__arrow" /></a>
+            <a class="btn btn--ghost" href={lp(lang, '/#runway')}>{c.runway}</a>
+          </div>
+        </div>
+      </article>
+    ))}
+  </section>
+</BaseLayout>
+<style>
+  .camp { padding-bottom: var(--section-y); }
+  .camp__item { display: grid; grid-template-columns: 1.2fr .8fr; gap: clamp(32px, 6vw, 96px); align-items: end; }
+  .camp__frame { position: relative; aspect-ratio: 4/3; background: radial-gradient(60% 60% at 50% 45%, var(--crimson-24), transparent 70%), var(--color-obsidian); border: 1px solid var(--border-subtle); display: grid; place-items: center; overflow: hidden; }
+  .camp__cross { width: 28%; color: var(--color-ice); }
+  .camp__n { position: absolute; left: var(--space-5); bottom: -0.12em; font: 400 clamp(5rem, 14vw, 13rem)/.8 var(--font-display); letter-spacing: -0.05em; color: var(--ice-14); }
+  .camp__status { position: absolute; right: var(--space-5); top: var(--space-5); display: inline-flex; gap: var(--space-2); align-items: center; }
+  .camp__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-crimson); }
+  .camp__text { display: grid; gap: var(--space-6); }
+  @media (max-width: 899px) { .camp__item { grid-template-columns: 1fr; } }
+</style>

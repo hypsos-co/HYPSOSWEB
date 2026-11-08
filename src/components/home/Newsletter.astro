@@ -1,0 +1,29 @@
+---
+import NewsletterForm from '../ui/NewsletterForm.astro';
+import Cross from '../brand/Cross.astro';
+import { getDict, type Locale } from '../../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const t = getDict(lang).newsletter;
+---
+<section class="nl surface-ice" aria-labelledby="nl-title">
+  <div class="nl__grid wrap-full">
+    <div>
+      <p class="t-label t-muted">{t.eyebrow}</p>
+      <h2 id="nl-title" class="t-section" data-split>{t.title}</h2>
+    </div>
+    <div class="nl__form">
+      <p class="t-lead">{t.text}</p>
+      <NewsletterForm lang={lang} id="nl-home" />
+    </div>
+    <span class="nl__cross" aria-hidden="true"><Cross /></span>
+  </div>
+</section>
+<style>
+  .nl { position: relative; overflow: hidden; padding-block: clamp(80px, 10vw, 160px); }
+  .nl__grid { position: relative; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(32px, 6vw, 96px); align-items: end; }
+  .nl__grid h2 { margin-top: var(--space-5); }
+  .nl__form { display: grid; gap: var(--space-6); }
+  .nl__cross { position: absolute; right: var(--gutter); top: calc(-1 * clamp(40px, 6vw, 100px)); width: 40px; color: var(--color-crimson); }
+  @media (max-width: 899px) { .nl__grid { grid-template-columns: 1fr; } }
+</style>

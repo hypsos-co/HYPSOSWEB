@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHead from '../../../components/ui/PageHead.astro';
+import Breadcrumbs from '../../../components/ui/Breadcrumbs.astro';
+import { getDict, fmt, localeParams, langFromParam, lp } from '../../../i18n';
+import { getCatalog } from '../../../lib/catalog';
+import { pickSrc } from '../../../lib/img';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+const catalog = await getCatalog(lang);
+const cols = catalog.collections.filter((c) => c.productHandles.length);
+---
+<BaseLayout lang={lang} path="/collections" title={t.nav.collections} mode="product">
+  <PageHead eyebrow="HYPSOS / COLLECTIONS" title={t.nav.collections}>
+    <Breadcrumbs slot="crumbs" lang={lang} items={[{ label: t.nav.collections }]} />
+  </PageHead>
+  <section class="cidx wrap-full">
+    <ol class="cidx__list" role="list">
+      {cols.map((c, i) => (
+        <li class="cidx__item" data-reveal="fade" style={`--d:${(i % 3) * 0.06}s`}>
+          <a class="cidx__link" href={lp(lang, `/collections/${c.handle}`)} data-cursor="explore">
+            <span class="cidx__n t-label">{String(i + 1).padStart(2, '0')}</span>
+            <span class="cidx__title">{c.title}</span>
+            <span class="cidx__count t-label t-muted">{c.productHandles.length === 1 ? t.common.product : fmt(t.common.products, { n: c.productHandles.length })}</span>
+            {c.image && <span class="cidx__img plinth" aria-hidden="true"><img src={pickSrc(c.image, 480)} alt="" width="480" height="600" loading="lazy" decoding="async" /></span>}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </section>
+</BaseLayout>
+<style>
+  .cidx { padding-bottom: var(--section-y); }
+  .cidx__list { border-top: 1px solid var(--border-subtle); }
+  .cidx__item { border-bottom: 1px solid var(--border-subtle); }
+  .cidx__link { position: relative; display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: var(--space-6); padding: clamp(20px, 3vw, 40px) 0; }
+  .cidx__n { color: var(--color-crimson); }
+  .cidx__title { font: 400 clamp(2rem, 5.5vw, 5.5rem)/.95 var(--font-display); letter-spacing: -0.04em; transition: transform .8s var(--ease-standard), color .4s; }
+  .cidx__img { position: absolute; right: 18%; top: 50%; width: clamp(120px, 14vw, 220px); aspect-ratio: 4/5; overflow: hidden; pointer-events: none; opacity: 0; transform: translateY(-50%) rotate(-4deg) scale(.9); transition: opacity .4s, transform .8s var(--ease-standard); z-index: 2; }
+  .cidx__img img { width: 100%; height: 100%; object-fit: contain; }
+  @media (hover: hover) {
+    .cidx__link:hover .cidx__title { transform: translateX(16px); color: var(--color-crimson); }
+    .cidx__link:hover .cidx__img { opacity: 1; transform: translateY(-50%) rotate(3deg) scale(1); }
+  }
+  @media (max-width: 749px) { .cidx__link { grid-template-columns: 40px 1fr; } .cidx__count { grid-column: 2; } .cidx__img { display: none; } }
+</style>

@@ -1,0 +1,16 @@
+/* Brand display face (supplied: Coolvetica by Typodermic — verify webfont licence before launch).
+   To switch to Hypsos2: drop the file in /public/fonts and change the src below. */
+@font-face {
+  font-family: "Coolvetica";
+  src: url("/fonts/coolvetica-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Coolvetica";
+  src: url("/fonts/coolvetica-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}

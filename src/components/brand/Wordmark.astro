@@ -1,0 +1,9 @@
+---
+/** Official HYPSOS wordmark — geometry from brand/source/HYPSOS.ai (never redrawn). */
+import logos from '../../data/generated/logos.json';
+interface Props { class?: string; title?: string; decorative?: boolean }
+const { class: cls = '', title = 'HYPSOS', decorative = false } = Astro.props;
+const w = logos.wordmark;
+---
+<svg class={`wordmark ${cls}`} viewBox={w.viewBox} fill="currentColor" role={decorative ? undefined : 'img'} aria-hidden={decorative ? 'true' : undefined} aria-label={decorative ? undefined : title} preserveAspectRatio="xMidYMid meet"><path d={w.d}/></svg>
+<style>.wordmark{display:block;height:auto;width:100%;overflow:visible}</style>

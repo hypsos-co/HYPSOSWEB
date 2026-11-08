@@ -1,0 +1,55 @@
+---
+import Cross from '../brand/Cross.astro';
+import Icon from '../ui/Icon.astro';
+import { getDict, type Locale } from '../../i18n';
+import { CAMPAIGN } from '../../data/site';
+interface Props { lang: Locale }
+const d = getDict(Astro.props.lang);
+const t = d.home.film;
+const hasFilm = !!CAMPAIGN.filmSrc;
+---
+<section class="film section" aria-labelledby="film-title">
+  <div class="film__head wrap-full">
+    <p class="t-label t-muted" data-reveal="fade">{t.eyebrow}</p>
+    <h2 id="film-title" class="t-section" data-split>{t.title}</h2>
+  </div>
+  <div class="wrap-full">
+    <div class="film__frame" data-reveal="scale">
+      {hasFilm ? (
+        <div class="film__player" data-film data-cursor="play">
+          <video class="film__video" src={CAMPAIGN.filmSrc} poster={CAMPAIGN.filmPoster || undefined} muted playsinline loop preload="none" data-film-video></video>
+          <div class="film__controls">
+            <button class="icon-btn" type="button" data-film-toggle aria-label={d.common.play} data-label-play={d.common.play} data-label-pause={d.common.pause}><Icon name="play" /></button>
+            <button class="icon-btn" type="button" data-film-mute aria-label={d.common.unmute} aria-pressed="false" data-label-mute={d.common.mute} data-label-unmute={d.common.unmute}><Icon name="mute" /></button>
+          </div>
+        </div>
+      ) : (
+        <div class="film__pending" role="img" aria-label={`${t.title} — ${t.pending}`}>
+          <div class="film__grid" aria-hidden="true"></div>
+          <div class="film__cross" aria-hidden="true"><Cross /></div>
+          <div class="film__meta">
+            <span class="t-label"><span class="film__rec"></span>{t.eyebrow} — {t.pending}</span>
+            <span class="t-label t-muted">16:9 · HYPSOS</span>
+          </div>
+          <p class="film__note t-small">{t.pendingText}</p>
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+<style>
+  .film__head { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-6); flex-wrap: wrap; margin-bottom: clamp(32px, 5vw, 64px); }
+  .film__head .t-label { order: 2; }
+  .film__frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--color-obsidian); border: 1px solid var(--border-subtle); }
+  .film__player, .film__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .film__controls { position: absolute; left: var(--space-5); bottom: var(--space-5); display: flex; gap: var(--space-2); padding: 4px; background: var(--obsidian-56); border-radius: var(--radius-pill); backdrop-filter: blur(8px); }
+  .film__pending { position: absolute; inset: 0; display: grid; place-items: center; }
+  .film__grid { position: absolute; inset: 0; background-image: linear-gradient(var(--ice-04) 1px, transparent 1px), linear-gradient(90deg, var(--ice-04) 1px, transparent 1px); background-size: 8.333% 14.81%; mask-image: radial-gradient(70% 70% at 50% 50%, var(--color-obsidian) 40%, transparent 100%); -webkit-mask-image: radial-gradient(70% 70% at 50% 50%, var(--color-obsidian) 40%, transparent 100%); }
+  .film__cross { width: clamp(64px, 9vw, 140px); color: var(--color-ice); animation: film-spin 14s linear infinite; filter: drop-shadow(0 0 32px rgb(var(--rgb-crimson) / .5)); }
+  @keyframes film-spin { to { transform: rotateY(360deg); } }
+  .film__meta { position: absolute; left: var(--space-5); right: var(--space-5); top: var(--space-5); display: flex; justify-content: space-between; color: var(--text-secondary); }
+  .film__rec { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--color-crimson); margin-right: var(--space-2); animation: rec 1.6s steps(2) infinite; }
+  @keyframes rec { 50% { opacity: .2; } }
+  .film__note { position: absolute; left: var(--space-5); bottom: var(--space-5); color: var(--text-muted); max-width: 40ch; }
+  @media (prefers-reduced-motion: reduce) { .film__cross, .film__rec { animation: none; } }
+</style>

@@ -1,0 +1,24 @@
+{
+  "name": "hypsos-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "HYPSOS — premium streetwear storefront (Astro + Shopify Storefront API)",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "assets": "python3 -I tools/build_assets.py",
+    "audit:colors": "node tools/audit-colors.mjs"
+  },
+  "engines": {
+    "node": ">=18.20"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "astro": "^5.18.2",
+    "gsap": "^3.13.0",
+    "three": "^0.180.0"
+  }
+}

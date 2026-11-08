@@ -1,0 +1,31 @@
+---
+import Cross from '../brand/Cross.astro';
+import Icon from '../ui/Icon.astro';
+import { getDict, lp, type Locale } from '../../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const t = getDict(lang).home.story;
+---
+<section class="story section grain" aria-labelledby="story-title" data-story>
+  <div class="story__grid wrap-full">
+    <div class="story__mark" aria-hidden="true">
+      <div class="story__cross" data-story-cross><Cross /></div>
+      <div class="story__axis"></div>
+    </div>
+    <div class="story__text">
+      <p class="t-label t-muted" data-reveal="fade">{t.eyebrow}</p>
+      <h2 id="story-title" class="t-section" data-split>{t.title}</h2>
+      <p class="t-lead" data-reveal="fade" style="--d:.15s">{t.body}</p>
+      <a class="btn btn--ghost" href={lp(lang, '/about')} data-reveal="fade" style="--d:.25s">{t.cta} <Icon name="arrow-right" class="btn__arrow" /></a>
+    </div>
+  </div>
+</section>
+<style>
+  .story { border-top: 1px solid var(--border-subtle); overflow: hidden; }
+  .story__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(40px, 6vw, 120px); align-items: center; }
+  .story__mark { position: relative; display: grid; place-items: center; aspect-ratio: 1; }
+  .story__cross { width: 70%; color: var(--color-crimson); will-change: transform, clip-path; }
+  .story__axis { position: absolute; left: 50%; top: -20%; bottom: -20%; width: 1px; background: linear-gradient(transparent, var(--ice-24), transparent); }
+  .story__text { display: flex; flex-direction: column; gap: var(--space-6); align-items: flex-start; }
+  @media (max-width: 749px) { .story__grid { grid-template-columns: 1fr; } .story__mark { max-width: 260px; } }
+</style>

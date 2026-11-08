@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Cross from '../components/brand/Cross.astro';
+import Icon from '../components/ui/Icon.astro';
+import { getDict } from '../i18n';
+const t = getDict('es');
+---
+<BaseLayout lang="es" path="/404" title="404" noindex hasAlternates={false}>
+  <section class="nf grain">
+    <div class="nf__cross" aria-hidden="true"><Cross /></div>
+    <p class="t-label t-muted">ERROR 404 / NOT FOUND</p>
+    <h1 class="t-hero">{t.notFound.title}</h1>
+    <p class="t-lead">{t.notFound.text} <span lang="en">This page doesn’t exist.</span></p>
+    <div class="cluster">
+      <a class="btn" href="/">{t.notFound.cta} <Icon name="arrow-right" class="btn__arrow" /></a>
+      <a class="btn btn--ghost" href="/shop">{t.nav.all}</a>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .nf { min-height: 100svh; display: grid; align-content: center; justify-items: start; gap: var(--space-6); padding: calc(var(--header-h) + 48px) var(--gutter) 96px; overflow: hidden; position: relative; }
+  .nf__cross { position: absolute; right: -6vw; top: 50%; width: min(52vw, 640px); transform: translateY(-50%) rotate(180deg); color: var(--color-crimson); opacity: .9; }
+  .nf > *:not(.nf__cross) { position: relative; z-index: 1; }
+</style>

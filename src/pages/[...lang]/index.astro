@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BrandEntry from '../../components/home/BrandEntry.astro';
+import Hero from '../../components/home/Hero.astro';
+import Marquee from '../../components/home/Marquee.astro';
+import Statement from '../../components/home/Statement.astro';
+import Collection from '../../components/home/Collection.astro';
+import Featured from '../../components/home/Featured.astro';
+import Film from '../../components/home/Film.astro';
+import XType from '../../components/home/XType.astro';
+import Runway from '../../components/sections/Runway.astro';
+import Selection from '../../components/home/Selection.astro';
+import Story from '../../components/home/Story.astro';
+import Newsletter from '../../components/home/Newsletter.astro';
+import { localeParams, langFromParam, lp } from '../../i18n';
+import { getCatalog } from '../../lib/catalog';
+
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const catalog = await getCatalog(lang);
+const site = Astro.site!;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'HYPSOS',
+  url: new URL(lp(lang, '/'), site).href,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: `${new URL(lp(lang, '/search'), site).href}?q={search_term_string}`,
+    'query-input': 'required name=search_term_string',
+  },
+};
+---
+<BaseLayout lang={lang} path="/" transparentHeader jsonLd={jsonLd} mode="editorial">
+  <BrandEntry lang={lang} />
+  <Hero lang={lang} />
+  <Marquee items={['Built for the top', 'The Elevation', 'Collection 001']} />
+  <Statement lang={lang} />
+  <Collection lang={lang} catalog={catalog} />
+  <Featured lang={lang} catalog={catalog} />
+  <Film lang={lang} />
+  <XType lang={lang} />
+  <Runway lang={lang} catalog={catalog} />
+  <Selection lang={lang} catalog={catalog} />
+  <Story lang={lang} />
+  <Newsletter lang={lang} />
+</BaseLayout>
+<script>
+  import '../../scripts/pages/home';
+</script>

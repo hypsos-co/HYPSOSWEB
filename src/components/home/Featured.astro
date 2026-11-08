@@ -1,0 +1,76 @@
+---
+import Icon from '../ui/Icon.astro';
+import Price from '../ui/Price.astro';
+import { getDict, lp, type Locale } from '../../i18n';
+import type { Catalog } from '../../lib/types';
+import { imageForColor } from '../../lib/catalog';
+interface Props { lang: Locale; catalog: Catalog; handle?: string }
+const { lang, catalog, handle = 'hoodie-001' } = Astro.props;
+const d = getDict(lang);
+const t = d.home.featured;
+const p = catalog.products.find((x) => x.handle === handle) ?? catalog.products.find((x) => x.isNew) ?? catalog.products[0];
+const color = p?.options.find((o) => o.key === 'color')?.values[0] ?? null;
+const front = p ? imageForColor(p, color, 'front') : null;
+const back = p ? imageForColor(p, color, 'back') : null;
+const sizes = p ? p.variants.filter((v) => !color || v.options.some((o) => o.value === color)) : [];
+const url = p ? lp(lang, `/products/${p.handle}`) + (color ? `?color=${encodeURIComponent(color)}` : '') : '#';
+---
+{p && front && (
+<section class="feat" data-feat aria-labelledby="feat-title">
+  <div class="feat__pin" data-feat-pin>
+    <div class="feat__stage plinth" data-cursor="view">
+      <span class="feat__ring" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" pathLength="1" /><circle class="feat__ring-p" cx="50" cy="50" r="48" pathLength="1" data-feat-ring /></svg></span>
+      <a href={url} class="feat__imgs" tabindex="-1" aria-hidden="true">
+        <img class="feat__img" data-feat-front src={front.src} srcset={front.srcset} sizes="(min-width: 750px) 50vw, 90vw" width={front.width} height={front.height} alt="" loading="lazy" decoding="async" />
+        {back && back !== front && <img class="feat__img feat__img--back" data-feat-back src={back.src} srcset={back.srcset} sizes="(min-width: 750px) 50vw, 90vw" width={back.width} height={back.height} alt="" loading="lazy" decoding="async" />}
+      </a>
+      <span class="feat__tag t-label">{t.eyebrow}</span>
+    </div>
+    <div class="feat__text">
+      <p class="t-label t-muted">{t.eyebrow}</p>
+      <h2 id="feat-title" class="t-section">{p.title}</h2>
+      <ol class="feat__steps" role="list">
+        {t.steps.map((s, i) => (
+          <li class:list={['feat__step', { 'is-on': i === 0 }]} data-feat-step={i}>
+            <span class="feat__step-n t-label">0{i + 1}</span>
+            <div><p class="t-h4">{s}</p><p class="t-body">{t.stepsText[i]}</p></div>
+          </li>
+        ))}
+      </ol>
+      <div class="feat__buy">
+        <Price amount={p.priceRange.min.amount} lang={lang} currency={p.priceRange.min.currencyCode} class="t-h3" />
+        <span class="t-label t-muted">{[color, sizes.filter((v) => v.available).map((v) => v.options.find((o) => o.value !== color)?.value).filter(Boolean).join(' · ')].filter(Boolean).join(' — ')}</span>
+        <a class="btn btn--lg" href={url} data-magnetic=".15">{t.cta} <Icon name="arrow-right" class="btn__arrow" /></a>
+      </div>
+    </div>
+  </div>
+</section>
+)}
+<style>
+  .feat { position: relative; background: var(--color-obsidian); }
+  .feat__pin { min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: center; gap: clamp(32px, 5vw, 96px); padding: calc(var(--header-h) + 32px) var(--gutter) 48px; }
+  .feat__stage { position: relative; aspect-ratio: 4 / 5; max-height: calc(100svh - var(--header-h) - 80px); width: 100%; justify-self: center; overflow: hidden; }
+  .feat__imgs { position: absolute; inset: 0; display: block; }
+  .feat__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; will-change: transform, opacity; }
+  .feat__img--back { opacity: 0; }
+  .feat__ring { position: absolute; right: var(--space-5); top: var(--space-5); width: 56px; height: 56px; z-index: 2; }
+  .feat__ring svg { width: 100%; height: 100%; transform: rotate(-90deg); fill: none; stroke-width: 2; }
+  .feat__ring circle { stroke: var(--obsidian-14); }
+  .feat__ring .feat__ring-p { stroke: var(--color-crimson); stroke-dasharray: 1; stroke-dashoffset: var(--p-off, 1); }
+  .feat__tag { position: absolute; left: var(--space-5); bottom: var(--space-5); color: var(--color-obsidian); }
+  .feat__text { display: flex; flex-direction: column; gap: var(--space-8); max-width: 560px; }
+  .feat__steps { display: grid; gap: var(--space-5); padding: 0; margin: 0; }
+  .feat__step { display: grid; grid-template-columns: 48px 1fr; gap: var(--space-4); padding-top: var(--space-5); border-top: 1px solid var(--border-subtle); opacity: .32; transition: opacity .6s var(--ease-standard); position: relative; }
+  .feat__step::before { content: ""; position: absolute; left: 0; top: -1px; height: 1px; width: 100%; background: var(--color-crimson); transform: scaleX(0); transform-origin: left; transition: transform .9s var(--ease-standard); }
+  .feat__step.is-on { opacity: 1; }
+  .feat__step.is-on::before { transform: scaleX(1); }
+  .feat__step-n { color: var(--color-crimson); padding-top: 4px; }
+  .feat__step .t-body { margin-top: var(--space-2); }
+  .feat__buy { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); }
+  @media (max-width: 899px) {
+    .feat__pin { grid-template-columns: 1fr; padding-top: var(--section-y); }
+    .feat__stage { max-height: none; }
+    .feat__step { opacity: 1; }
+    .feat__step::before { transform: scaleX(1); }
+  }
+</style>

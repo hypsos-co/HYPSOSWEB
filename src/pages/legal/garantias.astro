@@ -1,0 +1,17 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+import { BRAND } from '../../data/site';
+---
+<LegalLayout slug="garantias" title="Garantías legales" description="Garantía legal de conformidad de los productos HYPSOS.">
+  <h2>1. Garantía legal de conformidad</h2>
+  <p>Los productos HYPSOS cuentan con la garantía legal de conformidad prevista en el Real Decreto Legislativo 1/2007 (modificado por el Real Decreto-ley 7/2021). HYPSOS responde de las faltas de conformidad que se manifiesten en un plazo de <strong>tres años</strong> desde la entrega.</p>
+  <h2>2. Presunción</h2>
+  <p>Salvo prueba en contrario, se presume que las faltas de conformidad que se manifiesten en los <strong>dos años</strong> siguientes a la entrega ya existían en ese momento.</p>
+  <h2>3. Medidas correctoras</h2>
+  <p>Ante una falta de conformidad puedes exigir la reparación o la sustitución del producto y, en los casos previstos legalmente, la reducción del precio o la resolución del contrato, sin coste para ti.</p>
+  <h2>4. Cómo ejercerla</h2>
+  <p>Escríbenos a <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a> indicando tu número de pedido, el producto y una descripción (y, si es posible, fotografías) del problema.</p>
+  <h2>5. Exclusiones</h2>
+  <p>La garantía no cubre el desgaste normal por el uso ni los daños derivados de un uso o cuidado inadecuados (consulta las instrucciones de cuidado de cada prenda cuando estén publicadas).</p>
+  <p><em>Plazos y referencias normativas a verificar por un profesional antes de la publicación.</em></p>
+</LegalLayout>

@@ -1,0 +1,161 @@
+/* ==========================================================================
+   HYPSOS — DESIGN TOKENS
+   Single source of truth. The interface uses ONLY three colours:
+     Obsidian #090303 · Ice #B8DEF5 · Crimson #E20A21
+   Transparencies of those three are allowed (declared here, never ad hoc).
+   See HYPSOS_DESIGN_SYSTEM.md before adding anything.
+   ========================================================================== */
+
+:root {
+  /* ── Official brand colours ─────────────────────────────────────────── */
+  --color-obsidian: #090303;
+  --color-ice: #B8DEF5;
+  --color-crimson: #E20A21;
+
+  /* RGB channels (for alpha ramps) */
+  --rgb-obsidian: 9 3 3;
+  --rgb-ice: 184 222 245;
+  --rgb-crimson: 226 10 33;
+
+  /* Alpha ramps — the only "extra" values permitted */
+  --ice-90: rgb(var(--rgb-ice) / .9);
+  --ice-72: rgb(var(--rgb-ice) / .72);
+  --ice-56: rgb(var(--rgb-ice) / .56);
+  --ice-40: rgb(var(--rgb-ice) / .4);
+  --ice-24: rgb(var(--rgb-ice) / .24);
+  --ice-14: rgb(var(--rgb-ice) / .14);
+  --ice-08: rgb(var(--rgb-ice) / .08);
+  --ice-04: rgb(var(--rgb-ice) / .04);
+
+  --obsidian-90: rgb(var(--rgb-obsidian) / .9);
+  --obsidian-72: rgb(var(--rgb-obsidian) / .72);
+  --obsidian-56: rgb(var(--rgb-obsidian) / .56);
+  --obsidian-40: rgb(var(--rgb-obsidian) / .4);
+  --obsidian-24: rgb(var(--rgb-obsidian) / .24);
+  --obsidian-14: rgb(var(--rgb-obsidian) / .14);
+  --obsidian-08: rgb(var(--rgb-obsidian) / .08);
+
+  --crimson-72: rgb(var(--rgb-crimson) / .72);
+  --crimson-40: rgb(var(--rgb-crimson) / .4);
+  --crimson-24: rgb(var(--rgb-crimson) / .24);
+  --crimson-12: rgb(var(--rgb-crimson) / .12);
+
+  /* ── Semantic colours ───────────────────────────────────────────────── */
+  --background-primary: var(--color-obsidian);
+  --background-light: var(--color-ice);
+  --background-accent: var(--color-crimson);
+  --surface-raised: var(--ice-04);
+  --surface-overlay: var(--obsidian-90);
+
+  --text-primary: var(--color-ice);
+  --text-secondary: var(--ice-72);
+  --text-muted: var(--ice-56);
+  --text-dark: var(--color-obsidian);
+  --text-dark-muted: var(--obsidian-72);
+
+  --accent-primary: var(--color-crimson);
+  --border-primary: var(--color-ice);
+  --border-subtle: var(--ice-14);
+  --border-strong: var(--ice-40);
+  --border-dark: var(--obsidian-24);
+
+  --focus-ring: var(--color-crimson);
+
+  /* Interaction */
+  --button-primary-bg: var(--color-ice);
+  --button-primary-text: var(--color-obsidian);
+  --button-secondary-bg: transparent;
+  --button-secondary-text: var(--color-ice);
+  --button-accent-bg: var(--color-crimson);
+  --button-accent-text: var(--color-ice);
+
+  /* ── Typography ─────────────────────────────────────────────────────── */
+  /* Brand display face. The brief names "Hypsos2-Regular.otf"; the file supplied is
+     Coolvetica (Typodermic). Swap the @font-face in fonts.css to change it everywhere. */
+  --font-brand: "Coolvetica", "Inter Variable", system-ui, sans-serif;
+  --font-display: var(--font-brand);
+  --font-ui: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --fs-mega: clamp(4.5rem, 17vw, 19rem);
+  --fs-hero: clamp(3.5rem, 10vw, 12rem);
+  --fs-section: clamp(2.5rem, 6vw, 7rem);
+  --fs-h2: clamp(2rem, 4.2vw, 4.5rem);
+  --fs-h3: clamp(1.5rem, 2.4vw, 2.5rem);
+  --fs-h4: clamp(1.125rem, 1.5vw, 1.5rem);
+  --fs-lead: clamp(1.0625rem, 1.5vw, 1.375rem);
+  --fs-body: clamp(0.875rem, 1.2vw, 1.0625rem);
+  --fs-small: 0.8125rem;
+  --fs-micro: 0.6875rem;
+  --fs-label: 0.6875rem;
+
+  --lh-display: 0.88;
+  --lh-heading: 0.95;
+  --lh-body: 1.6;
+  --track-display: -0.045em;
+  --track-heading: -0.03em;
+  --track-label: 0.14em;
+
+  /* ── Space (4px base) ───────────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+  --space-40: 160px;
+
+  --gutter: clamp(16px, 3.6vw, 56px);
+  --section-y: clamp(80px, 12vw, 180px);
+  --max-content: 1440px;
+  --max-text: 62ch;
+  --header-h: 72px;
+
+  /* ── Shape ──────────────────────────────────────────────────────────── */
+  --radius-0: 0px;
+  --radius-xs: 2px;
+  --radius-sm: 6px;
+  --radius-sheet: 20px;
+  --radius-pill: 999px;
+
+  /* ── Elevation (obsidian-only shadows) ──────────────────────────────── */
+  --shadow-float: 0 24px 60px -24px rgb(var(--rgb-obsidian) / .8);
+  --shadow-sheet: 0 -24px 60px -24px rgb(var(--rgb-obsidian) / .9);
+
+  /* ── Motion ─────────────────────────────────────────────────────────── */
+  --motion-fast: 180ms;
+  --motion-medium: 400ms;
+  --motion-slow: 750ms;
+  --motion-editorial: 1100ms;
+
+  --ease-standard: cubic-bezier(.22, 1, .36, 1);
+  --ease-smooth: cubic-bezier(.65, 0, .35, 1);
+  --ease-expressive: cubic-bezier(.76, 0, .24, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-sheet: cubic-bezier(.32, .72, 0, 1);
+
+  /* ── Layers ─────────────────────────────────────────────────────────── */
+  --z-base: 1;
+  --z-sticky: 100;
+  --z-header: 400;
+  --z-menu: 500;
+  --z-drawer: 700;
+  --z-modal: 800;
+  --z-consent: 900;
+  --z-toast: 950;
+  --z-cursor: 990;
+  --z-intro: 1000;
+
+  color-scheme: dark;
+}
+
+@media (max-width: 749px) {
+  :root { --header-h: 60px; }
+}

@@ -1,0 +1,64 @@
+---
+import Cross from '../brand/Cross.astro';
+import Icon from '../ui/Icon.astro';
+import { getDict, lp, type Locale } from '../../i18n';
+import { CAMPAIGN } from '../../data/site';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const t = getDict(lang).home.hero;
+---
+<section class="hero grain" data-hero aria-labelledby="hero-title">
+  {CAMPAIGN.heroImage && <img class="hero__photo" src={CAMPAIGN.heroImage} alt="" fetchpriority="high" decoding="async" />}
+  <div class="hero__glow" aria-hidden="true"></div>
+  <div class="hero__cross cross3d" data-cross3d aria-hidden="true">
+    <div class="cross3d__svg"><Cross /></div>
+  </div>
+  <div class="hero__top wrap-full">
+    <p class="t-label" data-hero-in style="--d:.1s">{t.eyebrow}</p>
+    <p class="t-label hero__top-r" data-hero-in style="--d:.2s">N° 001 — {t.title}</p>
+  </div>
+  <h1 id="hero-title" class="hero__title" data-hero-title>
+    <span class="hero__line"><span data-hero-word>The</span></span>
+    <span class="hero__line hero__line--big"><span data-hero-word>Elevation</span></span>
+  </h1>
+  <div class="hero__foot wrap-full">
+    <p class="hero__kicker t-h3" data-hero-in style="--d:.9s">{t.kicker}</p>
+    <a class="btn btn--ghost btn--lg" href={lp(lang, '/shop')} data-magnetic=".18" data-hero-in style="--d:1s">{t.cta} <Icon name="arrow-right" class="btn__arrow" /></a>
+    <span class="hero__scroll t-label" aria-hidden="true" data-hero-in style="--d:1.2s"><span class="hero__scroll-line"></span>{t.scroll}</span>
+  </div>
+</section>
+
+<style>
+  .hero { position: relative; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto auto; overflow: hidden; background: var(--color-obsidian); isolation: isolate; }
+  .hero__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+  .hero__photo + .hero__glow { background: linear-gradient(to top, var(--color-obsidian) 4%, transparent 55%); }
+  .hero__glow { position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(42% 46% at 52% 42%, rgb(var(--rgb-ice) / .10), transparent 70%),
+      radial-gradient(30% 34% at 66% 56%, rgb(var(--rgb-crimson) / .16), transparent 70%); }
+  .hero__cross { position: absolute; inset: 0; z-index: 0; }
+  .hero__top { position: relative; z-index: 2; display: flex; justify-content: space-between; padding-top: calc(var(--header-h) + var(--space-6)); color: var(--text-secondary); }
+  .hero__title { position: relative; z-index: 1; align-self: end; padding-inline: var(--gutter); font-family: var(--font-display); font-weight: 400; color: var(--color-ice); line-height: .8; letter-spacing: -0.055em; margin: 0; pointer-events: none; }
+  .hero__line { display: block; overflow: hidden; padding-bottom: .04em; }
+  .hero__line > span { display: inline-block; }
+  .hero__line:first-child { font-size: clamp(3rem, 8vw, 9rem); padding-left: .06em; }
+  .hero__line--big { font-size: clamp(4.6rem, 18.4vw, 21rem); margin-left: -.05em; }
+  .hero__foot { position: relative; z-index: 2; display: flex; align-items: center; gap: var(--space-6); justify-content: space-between; padding-top: var(--space-6); padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom)); flex-wrap: wrap; }
+  .hero__kicker { color: var(--text-primary); margin-right: auto; }
+  .hero__scroll { display: inline-flex; align-items: center; gap: var(--space-3); color: var(--text-muted); }
+  .hero__scroll-line { position: relative; width: 1px; height: 36px; background: var(--ice-14); overflow: hidden; }
+  .hero__scroll-line::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 40%; background: var(--color-crimson); animation: scroll-line 2.2s var(--ease-expressive) infinite; }
+  @keyframes scroll-line { from { transform: translateY(-100%); } to { transform: translateY(260%); } }
+
+  :global(.js) [data-hero-in] { opacity: 0; transform: translateY(16px); transition: opacity 1s var(--ease-standard), transform 1.2s var(--ease-standard); transition-delay: calc(var(--d, 0s) + var(--intro-delay, 0s)); }
+  :global(.js) [data-hero-word] { transform: translateY(105%); transition: transform 1.4s var(--ease-expressive); transition-delay: calc(.25s + var(--intro-delay, 0s)); }
+  :global(.js) .hero__line--big [data-hero-word] { transition-delay: calc(.4s + var(--intro-delay, 0s)); }
+  :global(.js) .hero.is-ready [data-hero-in], :global(.js) .hero.is-ready [data-hero-word] { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { :global(.js) [data-hero-in], :global(.js) [data-hero-word] { opacity: 1 !important; transform: none !important; transition: none !important; } }
+  @media (max-width: 749px) {
+    .hero__top-r { display: none; }
+    .hero__foot { flex-direction: column; align-items: flex-start; gap: var(--space-4); }
+    .hero__scroll { display: none; }
+    .hero__line--big { font-size: 20.5vw; }
+  }
+</style>

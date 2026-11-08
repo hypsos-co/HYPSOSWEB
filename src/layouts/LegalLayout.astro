@@ -1,0 +1,36 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+import { LEGAL_PAGES } from '../data/site';
+interface Props { slug: string; title: string; description: string; updated?: string }
+const { slug, title, description, updated = '[FECHA DE ÚLTIMA ACTUALIZACIÓN]' } = Astro.props;
+---
+<BaseLayout lang="es" path={`/legal/${slug}`} title={title} description={description} hasAlternates={false} mode="functional">
+  <header class="page-head wrap-full">
+    <Breadcrumbs lang="es" items={[{ label: 'Legal' }, { label: title }]} />
+    <p class="page-head__eyebrow t-label" style="margin-top: var(--space-10)">HYPSOS / LEGAL</p>
+    <h1 class="t-section">{title}</h1>
+    <p class="t-small t-muted" style="margin-top: var(--space-4)">Última actualización: <span class="ph">{updated}</span></p>
+  </header>
+  <section class="legal wrap-full">
+    <nav class="legal__nav" aria-label="Documentos legales">
+      <ul role="list">
+        {LEGAL_PAGES.map((l) => <li><a class:list={['legal__a', { 'is-on': l.slug === slug }]} href={l.path} aria-current={l.slug === slug ? 'page' : undefined}>{l.title}</a></li>)}
+      </ul>
+    </nav>
+    <div>
+      <p class="notice legal__draft" role="note"><span class="badge">BORRADOR</span><span>Documento borrador editable. Los campos entre corchetes deben completarse y el texto debe ser revisado por un profesional jurídico antes de publicar la tienda. No constituye asesoramiento legal.</span></p>
+      <div class="prose"><slot /></div>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .legal { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); padding-bottom: var(--section-y); }
+  .legal__nav ul { position: sticky; top: calc(var(--header-h) + 24px); display: flex; flex-direction: column; gap: 2px; }
+  .legal__a { display: block; padding: var(--space-2) 0 var(--space-2) var(--space-4); border-left: 1px solid var(--border-subtle); color: var(--text-muted); font-size: var(--fs-small); }
+  .legal__a:hover { color: var(--text-primary); }
+  .legal__a.is-on { color: var(--text-primary); border-left-color: var(--color-crimson); }
+  .legal__draft { margin-bottom: var(--space-10); max-width: 72ch; }
+  .legal .prose :global(h2:first-child) { margin-top: 0; }
+  @media (max-width: 899px) { .legal { grid-template-columns: 1fr; } .legal__nav ul { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--space-2); } .legal__a { border: 1px solid var(--border-subtle); border-radius: var(--radius-pill); padding: var(--space-2) var(--space-4); } }
+</style>

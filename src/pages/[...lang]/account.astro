@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { getDict, localeParams, langFromParam, lp } from '../../i18n';
+import { shopifyConfig } from '../../lib/shopify/storefront';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+const sf = shopifyConfig();
+---
+<BaseLayout lang={lang} path="/account" title={t.account.title} noindex mode="functional">
+  <PageHead eyebrow="HYPSOS / ACCOUNT" title={t.account.title} size="section" />
+  <section class="wrap-full accp">
+    {sf ? (
+      <div class="accp__card">
+        <p class="t-lead">{t.account.text}</p>
+        <a class="btn btn--lg" href={`https://${sf.domain}/account`} rel="noopener">{t.account.cta} <Icon name="arrow-up-right" class="btn__arrow" /></a>
+      </div>
+    ) : (
+      <div class="accp__card">
+        <p class="notice"><span class="badge">DEMO</span><span>{t.account.notConnected}</span></p>
+        <div class="cluster">
+          <a class="btn btn--ghost" href={lp(lang, '/favorites')}>{t.nav.favorites}</a>
+          <a class="btn btn--ghost" href={lp(lang, '/cart')}>{t.cart.title}</a>
+          <a class="btn btn--ghost" href={lp(lang, '/help/order-tracking')}>{t.nav.help}</a>
+        </div>
+      </div>
+    )}
+  </section>
+</BaseLayout>
+<style>
+  .accp { padding-bottom: var(--section-y); }
+  .accp__card { display: grid; gap: var(--space-6); max-width: 720px; padding: var(--space-8); border: 1px solid var(--border-subtle); background: var(--ice-04); }
+</style>

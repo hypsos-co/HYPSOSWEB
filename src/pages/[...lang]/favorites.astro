@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import ProductCard from '../../components/product/ProductCard.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { getDict, localeParams, langFromParam, lp } from '../../i18n';
+import { getCatalog } from '../../lib/catalog';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+const catalog = await getCatalog(lang);
+---
+<BaseLayout lang={lang} path="/favorites" title={t.favorites.title} noindex mode="functional">
+  <PageHead eyebrow="HYPSOS / SAVED" title={t.favorites.title} lead={t.favorites.note} size="section" />
+  <section class="wrap-full favp">
+    <div class="pgrid" data-fav-grid>
+      {catalog.products.map((p, i) => <div class="favp__cell" data-fav-cell={p.handle} hidden><ProductCard product={p} lang={lang} index={i} reveal={false} /></div>)}
+    </div>
+    <div class="empty-state" data-fav-empty hidden>
+      <p class="t-h3">{t.favorites.empty}</p>
+      <p class="t-body">{t.favorites.emptyText}</p>
+      <a class="btn" href={lp(lang, '/shop')}>{t.nav.all} <Icon name="arrow-right" class="btn__arrow" /></a>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .favp { padding-bottom: var(--section-y); }
+  .favp__cell { display: contents; }
+  .favp__cell[hidden] { display: none !important; }
+</style>
+<script>
+  import { favorites } from '../../scripts/commerce/favorites';
+  const render = () => {
+    const list = favorites.all();
+    const grid = document.querySelector('[data-fav-grid]')!;
+    let n = 0;
+    list.forEach((h) => {
+      const cell = document.querySelector<HTMLElement>(`[data-fav-cell="${CSS.escape(h)}"]`);
+      if (cell) { cell.hidden = false; grid.appendChild(cell); n++; }
+    });
+    document.querySelectorAll<HTMLElement>('[data-fav-cell]').forEach((c) => { if (!list.includes(c.dataset.favCell!)) c.hidden = true; });
+    document.querySelector<HTMLElement>('[data-fav-empty]')!.hidden = n > 0;
+  };
+  render();
+  document.addEventListener('favorites:change', render);
+</script>

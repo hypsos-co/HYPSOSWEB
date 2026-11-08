@@ -1,0 +1,15 @@
+---
+interface Props { eyebrow?: string; title: string; lead?: string; size?: 'hero' | 'section' }
+const { eyebrow, title, lead, size = 'hero' } = Astro.props;
+---
+<header class="page-head wrap-full">
+  <slot name="crumbs" />
+  {eyebrow && <p class="page-head__eyebrow t-label" data-reveal="fade">{eyebrow}</p>}
+  <h1 class:list={[size === 'hero' ? 't-hero' : 't-section']} data-split>{title}</h1>
+  {lead && <p class="t-lead page-head__lead" data-reveal="fade" style="--d:.2s">{lead}</p>}
+  <slot />
+</header>
+<style>
+  .page-head :global(.crumbs) { margin-bottom: var(--space-10); }
+  .page-head__lead { margin-top: var(--space-6); }
+</style>

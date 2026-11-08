@@ -1,0 +1,217 @@
+---
+/** Global overlays: cart drawer, search, cookie consent, cursor, toasts. Behaviour in src/scripts. */
+import Icon from '../ui/Icon.astro';
+import Cross from '../brand/Cross.astro';
+import { getDict, lp, type Locale } from '../../i18n';
+import type { Catalog } from '../../lib/types';
+
+interface Props { lang: Locale; catalog: Catalog }
+const { lang, catalog } = Astro.props;
+const t = getDict(lang);
+const popular = ['Hoodie', 'Tee', 'Baggy', 'Crewneck', 'Beanie'];
+const cats = [
+  { key: 'sweats', label: t.categories.sweats },
+  { key: 'tops', label: t.categories.tops },
+  { key: 'bottoms', label: t.categories.bottoms },
+  { key: 'accessories', label: t.categories.accessories },
+];
+---
+<!-- CART DRAWER -->
+<div class="drawer" data-cart-drawer role="dialog" aria-modal="true" aria-labelledby="cart-title" hidden>
+  <button class="drawer__scrim" type="button" tabindex="-1" aria-hidden="true" data-cart-close></button>
+  <div class="drawer__panel">
+    <div class="drawer__head">
+      <h2 id="cart-title" class="t-h3">{t.cart.title} <sup class="t-label" data-cart-count-label></sup></h2>
+      <button class="icon-btn" type="button" aria-label={t.common.close} data-cart-close><Icon name="close" /></button>
+    </div>
+    {catalog.source === 'demo' && <p class="drawer__demo t-small"><span class="badge">DEMO</span> {t.demo.banner}</p>}
+    <div class="drawer__body" data-cart-lines aria-live="polite">
+      <div class="drawer__skeleton"><div class="skeleton" style="height:120px"></div><div class="skeleton" style="height:120px"></div></div>
+    </div>
+    <div class="drawer__empty" data-cart-empty hidden>
+      <span class="drawer__cross" aria-hidden="true"><Cross /></span>
+      <p class="t-h3">{t.cart.empty}</p>
+      <p class="t-body">{t.cart.emptyText}</p>
+      <a class="btn" href={lp(lang, '/shop')}>{t.cart.emptyCta} <Icon name="arrow-right" class="btn__arrow" /></a>
+    </div>
+    <div class="drawer__foot" data-cart-foot hidden>
+      <div class="drawer__row"><span class="t-label">{t.common.subtotal}</span><strong class="drawer__total" data-cart-subtotal>—</strong></div>
+      <p class="t-small t-muted">{t.common.taxNote}</p>
+      <p class="drawer__msg t-small" data-cart-msg role="status" hidden></p>
+      <button class="btn btn--lg btn--block btn--accent" type="button" data-checkout>{t.common.checkout} <Icon name="arrow-right" class="btn__arrow" /></button>
+      <div class="drawer__links">
+        <a class="link-u t-small" href={lp(lang, '/cart')}>{t.cart.viewBag}</a>
+        <button class="link-u t-small" type="button" data-cart-close>{t.common.continueShopping}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="search" data-search role="dialog" aria-modal="true" aria-label={t.search.label} hidden>
+  <div class="search__panel">
+    <form class="search__form" action={lp(lang, '/search')} method="get" role="search" data-search-form>
+      <label for="search-input" class="sr-only">{t.search.label}</label>
+      <Icon name="search" size={26} />
+      <input id="search-input" class="search__input" type="search" name="q" placeholder={t.search.placeholder} autocomplete="off" spellcheck="false" data-search-input aria-controls="search-results" aria-describedby="search-status" />
+      <button class="icon-btn" type="button" aria-label={t.common.close} data-search-close><Icon name="close" /></button>
+    </form>
+    <p id="search-status" class="sr-only" aria-live="polite" data-search-status></p>
+    <div class="search__body">
+      <div class="search__aside">
+        <div data-search-recent-wrap hidden>
+          <div class="search__aside-head"><p class="t-label t-muted">{t.search.recent}</p><button type="button" class="t-label link-u" data-search-clear>{t.search.clearRecent}</button></div>
+          <ul role="list" class="search__list" data-search-recent></ul>
+        </div>
+        <p class="t-label t-muted">{t.search.popular}</p>
+        <ul role="list" class="search__list">
+          {popular.map((p) => <li><button type="button" class="link-u" data-search-term={p}>{p}</button></li>)}
+        </ul>
+        <p class="t-label t-muted">{t.nav.categories}</p>
+        <ul role="list" class="search__list">
+          {cats.map((c) => <li><a class="link-u" href={lp(lang, `/collections/${c.key}`)}>{c.label}</a></li>)}
+        </ul>
+      </div>
+      <div class="search__results" id="search-results" data-search-results>
+        <p class="t-label t-muted" data-search-heading>{t.search.suggestions}</p>
+        <ul role="list" class="search__grid" data-search-grid></ul>
+        <div class="search__empty" data-search-empty hidden>
+          <p class="t-h3" data-search-empty-text></p>
+          <p class="t-body">{t.search.noResultsHint}</p>
+        </div>
+        <a class="btn btn--ghost search__all" href={lp(lang, '/search')} data-search-all hidden>{t.search.seeAll} <Icon name="arrow-right" class="btn__arrow" /></a>
+      </div>
+    </div>
+  </div>
+  <button class="search__scrim" type="button" tabindex="-1" aria-hidden="true" data-search-close></button>
+</div>
+
+<!-- COOKIE CONSENT -->
+<section class="consent" data-consent aria-labelledby="consent-title" hidden>
+  <div class="consent__card">
+    <p id="consent-title" class="t-h4">{t.cookies.title}</p>
+    <p class="t-small t-muted">{t.cookies.text} <a class="link-u link-u--on" href="/legal/cookies" hreflang="es-ES">{t.cookies.policy}</a></p>
+    <div class="consent__actions">
+      <button class="btn btn--sm btn--ghost" type="button" data-consent-reject>{t.cookies.reject}</button>
+      <button class="btn btn--sm btn--ghost" type="button" data-consent-configure>{t.cookies.configure}</button>
+      <button class="btn btn--sm" type="button" data-consent-accept>{t.cookies.accept}</button>
+    </div>
+  </div>
+</section>
+<dialog class="consent-dlg" data-consent-dialog aria-labelledby="consent-dlg-title">
+  <form method="dialog" class="consent-dlg__inner" data-consent-form>
+    <div class="consent-dlg__head">
+      <h2 id="consent-dlg-title" class="t-h3">{t.cookies.panelTitle}</h2>
+      <button class="icon-btn" type="button" aria-label={t.common.close} data-consent-dismiss><Icon name="close" /></button>
+    </div>
+    {[
+      { k: 'necessary', title: t.cookies.necessary, text: t.cookies.necessaryText, locked: true },
+      { k: 'preferences', title: t.cookies.preferences, text: t.cookies.preferencesText },
+      { k: 'analytics', title: t.cookies.analytics, text: t.cookies.analyticsText },
+      { k: 'marketing', title: t.cookies.marketing, text: t.cookies.marketingText },
+    ].map((c) => (
+      <div class="consent-dlg__row">
+        <div>
+          <p class="t-h4">{c.title} {c.locked && <span class="t-label t-muted">· {t.cookies.alwaysOn}</span>}</p>
+          <p class="t-small t-muted">{c.text}</p>
+        </div>
+        <span class="switch"><input type="checkbox" name={c.k} aria-label={c.title} checked={c.locked} disabled={c.locked} /></span>
+      </div>
+    ))}
+    <div class="consent-dlg__actions">
+      <button class="btn btn--sm btn--ghost" type="button" data-consent-reject>{t.cookies.reject}</button>
+      <button class="btn btn--sm btn--ghost" type="button" data-consent-accept>{t.cookies.accept}</button>
+      <button class="btn btn--sm" type="button" data-consent-save>{t.cookies.save}</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- CONTEXTUAL CURSOR (desktop, fine pointer only — the system cursor stays visible) -->
+<div class="ccursor" data-ccursor aria-hidden="true"><span class="ccursor__ring"><span class="ccursor__label" data-ccursor-label></span></span></div>
+
+<!-- TOASTS -->
+<div class="toasts" data-toasts role="status" aria-live="polite" aria-atomic="true"></div>
+
+<style>
+  /* drawer */
+  .drawer { position: fixed; inset: 0; z-index: var(--z-drawer); }
+  .drawer__scrim { position: absolute; inset: 0; background: var(--obsidian-56); backdrop-filter: blur(6px); opacity: 0; transition: opacity .5s var(--ease-standard); cursor: default; }
+  .drawer__panel { position: absolute; inset: 0 0 0 auto; width: min(480px, 100vw); display: flex; flex-direction: column; background: var(--color-obsidian); border-left: 1px solid var(--border-subtle); transform: translateX(100%); transition: transform .8s var(--ease-expressive); }
+  .drawer.is-open .drawer__scrim { opacity: 1; }
+  .drawer.is-open .drawer__panel { transform: none; }
+  .drawer__head { display: flex; justify-content: space-between; align-items: center; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border-subtle); }
+  .drawer__head sup { color: var(--color-crimson); vertical-align: top; }
+  .drawer__demo { display: flex; gap: var(--space-3); align-items: center; padding: var(--space-3) var(--space-6); border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); }
+  .drawer__body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 0 var(--space-6); }
+  .drawer__skeleton { display: grid; gap: var(--space-4); padding-block: var(--space-6); }
+  .drawer__empty { flex: 1; display: flex; flex-direction: column; gap: var(--space-4); align-items: flex-start; justify-content: center; padding: var(--space-8) var(--space-6); }
+  .drawer__cross { width: 48px; color: var(--color-crimson); margin-bottom: var(--space-4); }
+  .drawer__foot { padding: var(--space-5) var(--space-6) calc(var(--space-5) + env(safe-area-inset-bottom)); border-top: 1px solid var(--border-subtle); display: grid; gap: var(--space-3); }
+  .drawer__row { display: flex; justify-content: space-between; align-items: baseline; }
+  .drawer__total { font: 400 var(--fs-h4)/1 var(--font-display); font-variant-numeric: tabular-nums; }
+  .drawer__msg { color: var(--text-secondary); border-left: 2px solid var(--color-crimson); padding-left: var(--space-3); }
+  .drawer__links { display: flex; justify-content: space-between; }
+  @media (prefers-reduced-motion: reduce) { .drawer__panel, .drawer__scrim { transition: none; } }
+
+  /* search */
+  .search { position: fixed; inset: 0; z-index: var(--z-modal); }
+  .search__scrim { position: absolute; inset: 0; z-index: -1; background: var(--obsidian-56); backdrop-filter: blur(8px); opacity: 0; transition: opacity .5s; cursor: default; }
+  .search__panel { background: var(--color-obsidian); border-bottom: 1px solid var(--border-subtle); max-height: 100dvh; overflow-y: auto; clip-path: inset(0 0 100% 0); transition: clip-path .8s var(--ease-expressive); }
+  .search.is-open .search__panel { clip-path: inset(0); }
+  .search.is-open .search__scrim { opacity: 1; }
+  .search__form { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-5) var(--gutter); border-bottom: 1px solid var(--border-subtle); }
+  .search__input { flex: 1; min-width: 0; background: none; border: 0; outline: none; font: 400 clamp(1.75rem, 4vw, 3.5rem)/1.1 var(--font-display); letter-spacing: -0.03em; padding: var(--space-2) 0; }
+  .search__input::placeholder { color: var(--ice-40); }
+  .search__input::-webkit-search-cancel-button { display: none; }
+  .search__body { display: grid; grid-template-columns: 240px 1fr; gap: var(--space-10); padding: var(--space-8) var(--gutter) var(--space-12); }
+  .search__aside { display: flex; flex-direction: column; gap: var(--space-4); }
+  .search__aside-head { display: flex; justify-content: space-between; align-items: center; }
+  .search__list { display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-4); font-size: var(--fs-body); }
+  .search__list button { text-align: left; }
+  .search__results { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
+  .search__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-5); }
+  .search__all { align-self: flex-start; }
+  @media (max-width: 749px) {
+    .search__body { grid-template-columns: 1fr; gap: var(--space-6); }
+    .search__aside { order: 2; }
+    .search__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+  }
+
+  /* consent */
+  .consent { position: fixed; left: var(--space-4); bottom: var(--space-4); z-index: var(--z-consent); width: min(440px, calc(100vw - 32px)); }
+  .consent__card { display: grid; gap: var(--space-3); padding: var(--space-6); background: var(--color-obsidian); border: 1px solid var(--border-strong); box-shadow: var(--shadow-float); animation: consent-in .9s var(--ease-standard) both .6s; }
+  .consent__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+  .consent__actions .btn { flex: 1 1 auto; }
+  @keyframes consent-in { from { opacity: 0; transform: translateY(24px); } }
+  .consent-dlg { width: min(560px, calc(100vw - 32px)); max-height: 88dvh; padding: 0; border: 1px solid var(--border-strong); background: var(--color-obsidian); color: var(--color-ice); }
+  .consent-dlg::backdrop { background: var(--obsidian-72); backdrop-filter: blur(6px); }
+  .consent-dlg__inner { display: grid; gap: 0; }
+  .consent-dlg__head { display: flex; justify-content: space-between; align-items: center; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border-subtle); }
+  .consent-dlg__row { display: flex; gap: var(--space-6); justify-content: space-between; align-items: center; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border-subtle); }
+  .consent-dlg__row > div { display: grid; gap: var(--space-1); }
+  .consent-dlg__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-5) var(--space-6); justify-content: flex-end; }
+
+  /* cursor */
+  .ccursor { position: fixed; left: 0; top: 0; z-index: var(--z-cursor); pointer-events: none; display: none; }
+  :global(.has-ccursor) .ccursor { display: block; }
+  :global(html.is-locked) .ccursor { display: none; }
+  .ccursor__ring {
+    position: absolute; left: -42px; top: -42px; width: 84px; height: 84px; border-radius: 50%;
+    display: grid; place-items: center; color: var(--color-obsidian);
+    background: var(--color-ice); mix-blend-mode: normal;
+    opacity: 0; transform: scale(.2); transition: transform .6s var(--ease-standard), opacity .35s, background-color .35s;
+  }
+  .ccursor.is-on .ccursor__ring { opacity: 1; transform: scale(1); }
+  .ccursor.is-accent .ccursor__ring { background: var(--color-crimson); color: var(--color-ice); }
+  .ccursor.is-press .ccursor__ring { transform: scale(.82); }
+  .ccursor__label { font: 600 10px/1 var(--font-mono); letter-spacing: .24em; padding-left: .24em; text-transform: uppercase; }
+
+  /* toasts */
+  .toasts { position: fixed; left: 50%; bottom: calc(var(--space-6) + env(safe-area-inset-bottom)); z-index: var(--z-toast); transform: translateX(-50%); display: grid; gap: var(--space-2); justify-items: center; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
+  .toasts :global(.toast) { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-5); background: var(--color-ice); color: var(--color-obsidian); font-size: var(--fs-small); font-weight: 500; box-shadow: var(--shadow-float); animation: toast-in .6s var(--ease-spring) both; pointer-events: auto; }
+  .toasts :global(.toast a), .toasts :global(.toast button) { text-decoration: underline; text-underline-offset: 3px; }
+  .toasts :global(.toast.is-out) { animation: toast-out .4s var(--ease-standard) both; }
+  .toasts :global(.toast__mark) { width: 8px; height: 8px; border-radius: 50%; background: var(--color-crimson); }
+  @keyframes toast-in { from { opacity: 0; transform: translateY(16px) scale(.96); } }
+  @keyframes toast-out { to { opacity: 0; transform: translateY(8px); } }
+</style>

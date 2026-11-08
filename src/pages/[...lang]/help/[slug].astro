@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHead from '../../../components/ui/PageHead.astro';
+import Breadcrumbs from '../../../components/ui/Breadcrumbs.astro';
+import HelpNav from '../../../components/ui/HelpNav.astro';
+import { getDict, LOCALES, DEFAULT_LOCALE, lp, type Locale } from '../../../i18n';
+import { HELP_PAGES_CONTENT } from '../../../data/help';
+export function getStaticPaths() {
+  return LOCALES.flatMap((lang) => Object.keys(HELP_PAGES_CONTENT).map((slug) => ({ params: { lang: lang === DEFAULT_LOCALE ? undefined : lang, slug }, props: { lang } })));
+}
+const { lang } = Astro.props as { lang: Locale };
+const slug = Astro.params.slug as keyof typeof HELP_PAGES_CONTENT;
+const t = getDict(lang);
+const c = HELP_PAGES_CONTENT[slug][lang];
+const ph = (s: string) => s.replace(/\[([^\]]+)\]/g, '<span class="ph">[$1]</span>');
+---
+<BaseLayout lang={lang} path={`/help/${slug}`} title={c.title} description={c.lead} mode="functional">
+  <PageHead eyebrow="HYPSOS / HELP" title={c.title} lead={c.lead} size="section">
+    <Breadcrumbs slot="crumbs" lang={lang} items={[{ label: t.nav.help, href: lp(lang, '/help') }, { label: c.title }]} />
+  </PageHead>
+  <section class="help wrap-full">
+    <HelpNav lang={lang} current={slug} />
+    <div class="prose">
+      {c.blocks.map((b) => (
+        <>
+          <h2>{b.h}</h2>
+          {b.p.map((p) => <p set:html={ph(p)} />)}
+        </>
+      ))}
+      {slug === 'returns' && <p><a href="/legal/desistimiento" hreflang="es-ES">Derecho de desistimiento (ES)</a> · <a href="/legal/devoluciones" hreflang="es-ES">Devoluciones y reembolsos (ES)</a></p>}
+      {slug === 'order-tracking' && <p><a href={lp(lang, '/account')}>{t.nav.account} →</a></p>}
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .help { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); padding-bottom: var(--section-y); }
+  .help .prose :global(h2:first-child) { margin-top: 0; }
+  @media (max-width: 899px) { .help { grid-template-columns: 1fr; } }
+</style>

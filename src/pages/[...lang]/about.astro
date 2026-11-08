@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import Cross from '../../components/brand/Cross.astro';
+import Wordmark from '../../components/brand/Wordmark.astro';
+import Icon from '../../components/ui/Icon.astro';
+import Marquee from '../../components/home/Marquee.astro';
+import { getDict, localeParams, langFromParam, lp } from '../../i18n';
+import { ABOUT } from '../../data/brand';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+const a = ABOUT[lang];
+---
+<BaseLayout lang={lang} path="/about" title={`About — ${a.title}`} description={a.lead} transparentHeader>
+  <section class="ab-hero grain">
+    <div class="wrap-full ab-hero__top"><Breadcrumbs lang={lang} items={[{ label: t.nav.about }]} /></div>
+    <div class="ab-hero__mark" aria-hidden="true"><Wordmark decorative /></div>
+    <div class="wrap-full ab-hero__foot">
+      <h1 class="t-hero" data-split>{a.title}</h1>
+      <p class="t-lead" data-reveal="fade" style="--d:.3s">{a.lead}</p>
+    </div>
+  </section>
+  <Marquee items={['Built for the top', 'The Elevation']} tone="obsidian" />
+  <section class="ab-ch section wrap-full">
+    {a.chapters.map((c, i) => (
+      <article class:list={['ab-ch__item', { 'ab-ch__item--alt': i % 2 === 1 }]}>
+        <p class="t-label t-crimson" data-reveal="fade">{c.k}</p>
+        <h2 class="t-section" data-split>{c.h}</h2>
+        <p class="t-lead" data-reveal="fade" style="--d:.15s">{c.p}</p>
+        {i === 2 && <span class="ab-ch__cross" aria-hidden="true" data-reveal="mask"><Cross /></span>}
+        {i === 3 && (
+          <div class="ab-ch__swatches" aria-hidden="true" data-reveal="fade">
+            <span class="sw sw--o"><span class="t-label">Obsidian<br />#090303</span></span>
+            <span class="sw sw--i"><span class="t-label">Ice<br />#B8DEF5</span></span>
+            <span class="sw sw--c"><span class="t-label">Crimson<br />#E20A21</span></span>
+          </div>
+        )}
+      </article>
+    ))}
+  </section>
+  <section class="ab-val surface-ice section">
+    <div class="wrap-full">
+      <p class="t-label t-muted">{a.valuesTitle}</p>
+      <ul class="ab-val__list" role="list">
+        {a.values.map((v, i) => <li data-reveal="fade" style={`--d:${i * 0.05}s`}><span class="t-label">{String(i + 1).padStart(2, '0')}</span>{v}</li>)}
+      </ul>
+      <a class="btn btn--dark btn--lg" href={lp(lang, '/collections/drop-01')}>{a.cta} <Icon name="arrow-right" class="btn__arrow" /></a>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .ab-hero { position: relative; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
+  .ab-hero__top { padding-top: calc(var(--header-h) + var(--space-8)); position: relative; z-index: 2; }
+  .ab-hero__mark { align-self: center; padding-inline: var(--gutter); color: var(--ice-08); }
+  .ab-hero__foot { display: grid; grid-template-columns: 1.2fr .8fr; gap: var(--space-8); align-items: end; padding-bottom: var(--space-12); position: relative; z-index: 2; }
+  .ab-ch { display: grid; gap: clamp(96px, 14vw, 220px); }
+  .ab-ch__item { position: relative; display: grid; gap: var(--space-6); max-width: 820px; }
+  .ab-ch__item--alt { margin-left: auto; }
+  .ab-ch__cross { position: absolute; right: -40%; top: 0; width: clamp(120px, 16vw, 240px); color: var(--color-crimson); }
+  .ab-ch__swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: var(--space-6); }
+  .sw { aspect-ratio: 3/4; display: flex; align-items: flex-end; padding: var(--space-4); }
+  .sw--o { background: var(--color-obsidian); color: var(--color-ice); border: 1px solid var(--border-subtle); }
+  .sw--i { background: var(--color-ice); color: var(--color-obsidian); }
+  .sw--c { background: var(--color-crimson); color: var(--color-ice); }
+  .ab-val__list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: var(--space-10) 0 var(--space-12); border-top: 1px solid var(--obsidian-24); }
+  .ab-val__list li { display: flex; gap: var(--space-4); align-items: baseline; padding: var(--space-6) 0; border-bottom: 1px solid var(--obsidian-24); font: 400 clamp(1.5rem, 3vw, 2.75rem)/1 var(--font-display); letter-spacing: -0.03em; }
+  .ab-val__list .t-label { color: var(--color-crimson); }
+  @media (max-width: 899px) { .ab-hero__foot { grid-template-columns: 1fr; } .ab-ch__cross { position: static; } .ab-val__list { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 599px) { .ab-val__list { grid-template-columns: 1fr; } }
+</style>

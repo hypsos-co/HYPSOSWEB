@@ -1,0 +1,27 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+const ph = (s: string) => `<span class="ph">${s}</span>`;
+---
+<LegalLayout slug="cookies" title="Política de cookies" description="Qué cookies y almacenamiento local usa HYPSOS y cómo gestionarlos.">
+  <h2>1. Qué son</h2>
+  <p>Las cookies y tecnologías similares (como el almacenamiento local del navegador) guardan pequeñas cantidades de información en tu dispositivo. Este Sitio sigue la <a href="https://www.aepd.es/guias/guia-cookies.pdf" target="_blank" rel="noopener noreferrer">Guía sobre el uso de las cookies de la AEPD</a>: las no necesarias solo se activan con tu consentimiento.</p>
+  <h2>2. Qué usamos</h2>
+  <table>
+    <thead><tr><th>Nombre</th><th>Tipo</th><th>Finalidad</th><th>Categoría</th><th>Duración</th></tr></thead>
+    <tbody>
+      <tr><td><code>hypsos-consent</code></td><td>Almacenamiento local</td><td>Guardar tus preferencias de cookies.</td><td>Necesaria</td><td>13 meses (después se vuelve a preguntar)</td></tr>
+      <tr><td><code>hypsos-cart-v1</code> / <code>hypsos-shopify-cart-id</code></td><td>Almacenamiento local</td><td>Mantener el contenido de tu bolsa.</td><td>Necesaria</td><td>Hasta que vacíes la bolsa o el carrito caduque</td></tr>
+      <tr><td><code>hypsos-favorites-v1</code></td><td>Almacenamiento local</td><td>Guardar los productos que marcas como favoritos (función solicitada por ti).</td><td>Necesaria</td><td>Hasta que los elimines</td></tr>
+      <tr><td><code>hypsos-intro</code></td><td>Almacenamiento de sesión</td><td>No repetir la animación de entrada en la misma sesión.</td><td>Necesaria</td><td>Sesión</td></tr>
+      <tr><td><code>hypsos-recent-searches</code></td><td>Almacenamiento local</td><td>Recordar tus búsquedas recientes.</td><td>Preferencias (requiere consentimiento)</td><td>Hasta que lo borres o retires el consentimiento</td></tr>
+      <tr><td>Cookies de Shopify</td><td>Cookies (dominio de Shopify)</td><td>Funcionamiento del checkout y del pago al finalizar la compra.</td><td>Necesarias / según Shopify</td><td>Ver la política de Shopify</td></tr>
+      <tr><td><Fragment set:html={ph('[HERRAMIENTA DE ANALÍTICA]')} /></td><td>Cookies</td><td><Fragment set:html={ph('[FINALIDAD]')} /></td><td>Analítica (requiere consentimiento)</td><td><Fragment set:html={ph('[DURACIÓN]')} /></td></tr>
+      <tr><td><Fragment set:html={ph('[HERRAMIENTA DE PUBLICIDAD]')} /></td><td>Cookies</td><td><Fragment set:html={ph('[FINALIDAD]')} /></td><td>Marketing (requiere consentimiento)</td><td><Fragment set:html={ph('[DURACIÓN]')} /></td></tr>
+    </tbody>
+  </table>
+  <p>Actualmente no se cargan herramientas de analítica ni de publicidad. Si se activan, se añadirán a esta tabla y solo funcionarán tras tu consentimiento.</p>
+  <h2>3. Cómo gestionar o retirar tu consentimiento</h2>
+  <p>Puedes aceptar, rechazar o configurar las cookies por categorías en el aviso que aparece en tu primera visita y cambiar tu elección en cualquier momento:</p>
+  <p><button type="button" class="btn btn--ghost btn--sm" data-consent-open>Configurar cookies</button></p>
+  <p>También puedes eliminar las cookies y el almacenamiento local desde la configuración de tu navegador.</p>
+</LegalLayout>

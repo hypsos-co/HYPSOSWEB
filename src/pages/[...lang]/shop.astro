@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import ShopView from '../../components/product/ShopView.astro';
+import { getDict, localeParams, langFromParam } from '../../i18n';
+import { getCatalog } from '../../lib/catalog';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+const catalog = await getCatalog(lang);
+---
+<BaseLayout lang={lang} path="/shop" title={t.shop.title} description={t.shop.intro} mode="product">
+  <PageHead eyebrow={t.shop.eyebrow} title={t.shop.title} lead={t.shop.intro}>
+    <Breadcrumbs slot="crumbs" lang={lang} items={[{ label: t.shop.title }]} />
+  </PageHead>
+  <section class="wrap-full" style="padding-bottom: var(--section-y)">
+    <ShopView lang={lang} products={catalog.products} />
+  </section>
+</BaseLayout>

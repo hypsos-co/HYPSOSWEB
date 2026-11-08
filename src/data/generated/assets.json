@@ -1,0 +1,624 @@
+{
+ "products": {
+  "oversized-tee/black-front": {
+   "480": {
+    "src": "/products/oversized-tee/black-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/oversized-tee/black-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "oversized-tee/black-back": {
+   "480": {
+    "src": "/products/oversized-tee/black-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/oversized-tee/black-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "oversized-tee/red-front": {
+   "480": {
+    "src": "/products/oversized-tee/red-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/oversized-tee/red-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "oversized-tee/red-back": {
+   "480": {
+    "src": "/products/oversized-tee/red-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/oversized-tee/red-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "baggy-shorts/black-front": {
+   "480": {
+    "src": "/products/baggy-shorts/black-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/baggy-shorts/black-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "baggy-shorts/black-back": {
+   "480": {
+    "src": "/products/baggy-shorts/black-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/baggy-shorts/black-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "baggy-shorts/red-front": {
+   "480": {
+    "src": "/products/baggy-shorts/red-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/baggy-shorts/red-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "baggy-shorts/red-back": {
+   "480": {
+    "src": "/products/baggy-shorts/red-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/baggy-shorts/red-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "baggy-pants/black-front": {
+   "480": {
+    "src": "/products/baggy-pants/black-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/baggy-pants/black-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "baggy-pants/black-back": {
+   "480": {
+    "src": "/products/baggy-pants/black-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/baggy-pants/black-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "baggy-pants/red-front": {
+   "480": {
+    "src": "/products/baggy-pants/red-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/baggy-pants/red-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "baggy-pants/red-back": {
+   "480": {
+    "src": "/products/baggy-pants/red-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/baggy-pants/red-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "zip-hoodie/black-front": {
+   "480": {
+    "src": "/products/zip-hoodie/black-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/zip-hoodie/black-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "zip-hoodie/black-back": {
+   "480": {
+    "src": "/products/zip-hoodie/black-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/zip-hoodie/black-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "zip-hoodie/red-front": {
+   "480": {
+    "src": "/products/zip-hoodie/red-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/zip-hoodie/red-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "zip-hoodie/red-back": {
+   "480": {
+    "src": "/products/zip-hoodie/red-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/zip-hoodie/red-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "pullover-hoodie/black-front": {
+   "480": {
+    "src": "/products/pullover-hoodie/black-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/pullover-hoodie/black-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "pullover-hoodie/black-back": {
+   "480": {
+    "src": "/products/pullover-hoodie/black-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/pullover-hoodie/black-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "pullover-hoodie/red-front": {
+   "480": {
+    "src": "/products/pullover-hoodie/red-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/pullover-hoodie/red-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "pullover-hoodie/red-back": {
+   "480": {
+    "src": "/products/pullover-hoodie/red-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/pullover-hoodie/red-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "crewneck/black-front": {
+   "480": {
+    "src": "/products/crewneck/black-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/crewneck/black-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "crewneck/black-back": {
+   "480": {
+    "src": "/products/crewneck/black-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/crewneck/black-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "crewneck/red-front": {
+   "480": {
+    "src": "/products/crewneck/red-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/crewneck/red-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "crewneck/red-back": {
+   "480": {
+    "src": "/products/crewneck/red-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/crewneck/red-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "beanie/black-front": {
+   "480": {
+    "src": "/products/beanie/black-front-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/beanie/black-front-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  },
+  "beanie/black-back": {
+   "480": {
+    "src": "/products/beanie/black-back-480.webp",
+    "w": 480,
+    "h": 600
+   },
+   "1000": {
+    "src": "/products/beanie/black-back-1000.webp",
+    "w": 1000,
+    "h": 1250
+   }
+  }
+ },
+ "looks": [
+  {
+   "index": 1,
+   "bbox": [
+    227,
+    159,
+    853,
+    1912
+   ],
+   "pieces": [
+    [
+     "beanie",
+     "black"
+    ],
+    [
+     "oversized-tee",
+     "black"
+    ],
+    [
+     "baggy-pants",
+     "red"
+    ]
+   ],
+   "1080": {
+    "src": "/looks/look-01-1080.webp",
+    "w": 1080,
+    "h": 1920
+   },
+   "640": {
+    "src": "/looks/look-01-640.webp",
+    "w": 640,
+    "h": 1138
+   },
+   "pins": [
+    {
+     "piece": "head",
+     "at": [
+      50.0,
+      13.9
+     ]
+    },
+    {
+     "piece": "top",
+     "at": [
+      54.6,
+      39.9
+     ]
+    },
+    {
+     "piece": "bottom",
+     "at": [
+      45.0,
+      81.3
+     ]
+    }
+   ]
+  },
+  {
+   "index": 2,
+   "bbox": [
+    209,
+    295,
+    870,
+    1912
+   ],
+   "pieces": [
+    null,
+    [
+     "pullover-hoodie",
+     "red"
+    ],
+    [
+     "baggy-pants",
+     "black"
+    ]
+   ],
+   "1080": {
+    "src": "/looks/look-02-1080.webp",
+    "w": 1080,
+    "h": 1920
+   },
+   "640": {
+    "src": "/looks/look-02-640.webp",
+    "w": 640,
+    "h": 1138
+   },
+   "pins": [
+    {
+     "piece": "top",
+     "at": [
+      54.9,
+      32.8
+     ]
+    },
+    {
+     "piece": "bottom",
+     "at": [
+      45.8,
+      81.3
+     ]
+    }
+   ]
+  },
+  {
+   "index": 3,
+   "bbox": [
+    209,
+    294,
+    870,
+    1477
+   ],
+   "pieces": [
+    null,
+    [
+     "zip-hoodie",
+     "black"
+    ],
+    [
+     "baggy-shorts",
+     "black"
+    ]
+   ],
+   "1080": {
+    "src": "/looks/look-03-1080.webp",
+    "w": 1080,
+    "h": 1920
+   },
+   "640": {
+    "src": "/looks/look-03-640.webp",
+    "w": 640,
+    "h": 1138
+   },
+   "pins": [
+    {
+     "piece": "top",
+     "at": [
+      54.9,
+      32.8
+     ]
+    },
+    {
+     "piece": "bottom",
+     "at": [
+      45.3,
+      67.3
+     ]
+    }
+   ]
+  },
+  {
+   "index": 4,
+   "bbox": [
+    218,
+    83,
+    862,
+    1912
+   ],
+   "pieces": [
+    [
+     "beanie",
+     "black"
+    ],
+    [
+     "crewneck",
+     "red"
+    ],
+    [
+     "baggy-pants",
+     "black"
+    ]
+   ],
+   "1080": {
+    "src": "/looks/look-04-1080.webp",
+    "w": 1080,
+    "h": 1920
+   },
+   "640": {
+    "src": "/looks/look-04-640.webp",
+    "w": 640,
+    "h": 1138
+   },
+   "pins": [
+    {
+     "piece": "head",
+     "at": [
+      50.0,
+      10.0
+     ]
+    },
+    {
+     "piece": "top",
+     "at": [
+      54.8,
+      36.6
+     ]
+    },
+    {
+     "piece": "bottom",
+     "at": [
+      45.8,
+      81.3
+     ]
+    }
+   ]
+  },
+  {
+   "index": 5,
+   "bbox": [
+    227,
+    159,
+    853,
+    1477
+   ],
+   "pieces": [
+    [
+     "beanie",
+     "black"
+    ],
+    [
+     "oversized-tee",
+     "red"
+    ],
+    [
+     "baggy-shorts",
+     "red"
+    ]
+   ],
+   "1080": {
+    "src": "/looks/look-05-1080.webp",
+    "w": 1080,
+    "h": 1920
+   },
+   "640": {
+    "src": "/looks/look-05-640.webp",
+    "w": 640,
+    "h": 1138
+   },
+   "pins": [
+    {
+     "piece": "head",
+     "at": [
+      50.0,
+      13.9
+     ]
+    },
+    {
+     "piece": "top",
+     "at": [
+      54.6,
+      39.9
+     ]
+    },
+    {
+     "piece": "bottom",
+     "at": [
+      45.4,
+      67.3
+     ]
+    }
+   ]
+  },
+  {
+   "index": 6,
+   "bbox": [
+    209,
+    295,
+    870,
+    1912
+   ],
+   "pieces": [
+    null,
+    [
+     "pullover-hoodie",
+     "black"
+    ],
+    [
+     "baggy-pants",
+     "red"
+    ]
+   ],
+   "1080": {
+    "src": "/looks/look-06-1080.webp",
+    "w": 1080,
+    "h": 1920
+   },
+   "640": {
+    "src": "/looks/look-06-640.webp",
+    "w": 640,
+    "h": 1138
+   },
+   "pins": [
+    {
+     "piece": "top",
+     "at": [
+      54.9,
+      32.8
+     ]
+    },
+    {
+     "piece": "bottom",
+     "at": [
+      45.0,
+      81.3
+     ]
+    }
+   ]
+  }
+ ]
+}

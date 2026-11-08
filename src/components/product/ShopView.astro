@@ -1,0 +1,151 @@
+---
+/** Catalogue grid with filters (size, colour, garment type, price, availability) and sort. Logic: src/scripts/pages/shop.ts */
+import ProductCard from './ProductCard.astro';
+import Icon from '../ui/Icon.astro';
+import { getDict, fmt, formatMoney, lp, type Locale } from '../../i18n';
+import type { Product } from '../../lib/types';
+
+interface Props { lang: Locale; products: Product[] }
+const { lang, products } = Astro.props;
+const t = getDict(lang);
+const uniq = <T,>(a: T[]) => Array.from(new Set(a));
+const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+const sizes = uniq(products.flatMap((p) => p.options.find((o) => o.key === 'size')?.values ?? [])).sort((a, b) => (sizeOrder.indexOf(a) + 1 || 99) - (sizeOrder.indexOf(b) + 1 || 99));
+const colors = uniq(products.flatMap((p) => p.options.find((o) => o.key === 'color')?.values ?? []));
+const types = uniq(products.map((p) => p.productType)).filter(Boolean);
+const prices = products.map((p) => p.priceRange.min.amount);
+const lo = Math.min(...prices), hi = Math.max(...prices);
+const step1 = Math.ceil((lo + (hi - lo) / 3) / 10) * 10;
+const step2 = Math.ceil((lo + (2 * (hi - lo)) / 3) / 10) * 10;
+const buckets = products.length > 1 && hi > lo ? [
+  { id: `0-${step1}`, label: fmt(t.shop.priceUnder, { v: formatMoney(step1, lang) }) },
+  { id: `${step1}-${step2}`, label: fmt(t.shop.priceBetween, { a: formatMoney(step1, lang), b: formatMoney(step2, lang) }) },
+  { id: `${step2}-`, label: fmt(t.shop.priceOver, { v: formatMoney(step2, lang) }) },
+] : [];
+const groups = [
+  { key: 'size', label: t.common.size, values: sizes.map((v) => ({ id: v, label: v })) },
+  { key: 'color', label: t.common.color, values: colors.map((v) => ({ id: v, label: v })) },
+  { key: 'type', label: t.shop.type, values: types.map((v) => ({ id: v, label: v })) },
+  { key: 'price', label: t.shop.priceRange, values: buckets },
+].filter((g) => g.values.length > 1);
+const data = (p: Product, i: number) => {
+  const so = p.options.find((o) => o.key === 'size');
+  const co = p.options.find((o) => o.key === 'color');
+  const si = so ? p.options.indexOf(so) : -1;
+  const ci = co ? p.options.indexOf(co) : -1;
+  const availSizes = uniq(p.variants.filter((v) => v.available && si >= 0).map((v) => v.options[si].value));
+  const availColors = uniq(p.variants.filter((v) => v.available && ci >= 0).map((v) => v.options[ci].value));
+  return {
+    'data-f-i': i,
+    'data-f-title': p.title.toLowerCase(),
+    'data-f-size': JSON.stringify(so?.values ?? []),
+    'data-f-size-a': JSON.stringify(availSizes),
+    'data-f-color': JSON.stringify(co?.values ?? []),
+    'data-f-color-a': JSON.stringify(availColors),
+    'data-f-type': p.productType,
+    'data-f-price': p.priceRange.min.amount,
+    'data-f-date': p.createdAt,
+    'data-f-avail': p.available ? '1' : '0',
+  };
+};
+---
+<div class="shop" data-shop data-count-one={t.shop.countOne} data-count-many={t.shop.count} data-apply={t.shop.apply}>
+  <div class="shop__bar">
+    <button class="shop__filter-btn btn btn--ghost btn--sm" type="button" data-filter-open aria-controls="shop-filters" aria-expanded="false">
+      <Icon name="filter" size={16} /> {t.shop.filters} <span class="shop__badge" data-filter-badge hidden></span>
+    </button>
+    <div class="shop__active" data-active-filters aria-live="polite"></div>
+    <p class="shop__count t-label t-muted" data-count aria-live="polite">{products.length === 1 ? t.shop.countOne : fmt(t.shop.count, { n: products.length })}</p>
+    <label class="shop__sort">
+      <span class="sr-only">{t.shop.sort}</span>
+      <select class="select select--sm" data-sort>
+        <option value="featured">{t.shop.sortFeatured}</option>
+        <option value="newest">{t.shop.sortNewest}</option>
+        <option value="price-asc">{t.shop.sortPriceAsc}</option>
+        <option value="price-desc">{t.shop.sortPriceDesc}</option>
+        <option value="name">{t.shop.sortName}</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="pgrid shop__grid" data-grid>
+    {products.map((p, i) => (
+      <div class="shop__cell" {...data(p, i)}>
+        <ProductCard product={p} lang={lang} index={i} eager={i < 4} reveal={i >= 8} />
+      </div>
+    ))}
+  </div>
+  <div class="empty-state" data-empty hidden>
+    <p class="t-h3">{t.shop.noResults}</p>
+    <button class="btn btn--ghost" type="button" data-filter-clear>{t.shop.clear}</button>
+  </div>
+
+  <div class="fdrawer" id="shop-filters" data-filters role="dialog" aria-modal="true" aria-labelledby="filters-title" hidden>
+    <button class="fdrawer__scrim" type="button" tabindex="-1" aria-hidden="true" data-filter-close></button>
+    <form class="fdrawer__panel" data-filter-form onsubmit="return false">
+      <div class="fdrawer__head">
+        <h2 id="filters-title" class="t-h3">{t.shop.filters}</h2>
+        <button class="icon-btn" type="button" aria-label={t.common.close} data-filter-close><Icon name="close" /></button>
+      </div>
+      <div class="fdrawer__body">
+        {groups.map((g) => (
+          <fieldset class="fgroup">
+            <legend class="t-label t-muted">{g.label}</legend>
+            <div class="fgroup__vals">
+              {g.values.map((v) => (
+                <label class="fopt">
+                  <input class="sr-only" type="checkbox" name={g.key} value={v.id} />
+                  <span class="chip">{v.label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ))}
+        <label class="fswitch">
+          <span>{t.shop.onlyAvailable}</span>
+          <span class="switch"><input type="checkbox" name="avail" value="1" /></span>
+        </label>
+      </div>
+      <div class="fdrawer__foot">
+        <button class="btn btn--ghost" type="button" data-filter-clear>{t.shop.clear}</button>
+        <button class="btn" type="button" data-filter-apply>{fmt(t.shop.apply, { n: products.length })}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .shop__bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: var(--space-4); padding: var(--space-4) 0; margin-bottom: var(--space-8); background: var(--obsidian-90); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-subtle); }
+  :global(.hdr:not(.is-hidden)) ~ main .shop__bar { top: var(--header-h); }
+  .shop__badge { min-width: 18px; height: 18px; padding: 0 5px; display: inline-grid; place-items: center; border-radius: 9px; background: var(--color-crimson); color: var(--color-ice); font: 600 10px/1 var(--font-mono); }
+  .shop__active { display: flex; flex-wrap: wrap; gap: var(--space-2); flex: 1; min-width: 0; }
+  .shop__active :global(.chip) { min-height: 32px; gap: var(--space-2); }
+  .shop__count { white-space: nowrap; }
+  .select--sm { min-height: 36px; padding-left: var(--space-4); font-size: var(--fs-small); width: auto; }
+  .shop__cell { display: contents; }
+  .shop__cell[hidden] { display: none !important; }
+  .fdrawer { position: fixed; inset: 0; z-index: var(--z-drawer); }
+  .fdrawer__scrim { position: absolute; inset: 0; background: var(--obsidian-56); backdrop-filter: blur(6px); opacity: 0; transition: opacity .5s; cursor: default; }
+  .fdrawer__panel { position: absolute; inset: 0 auto 0 0; width: min(440px, 100vw); display: flex; flex-direction: column; background: var(--color-obsidian); border-right: 1px solid var(--border-subtle); transform: translateX(-100%); transition: transform .8s var(--ease-expressive); }
+  .fdrawer.is-open .fdrawer__scrim { opacity: 1; }
+  .fdrawer.is-open .fdrawer__panel { transform: none; }
+  .fdrawer__head { display: flex; justify-content: space-between; align-items: center; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border-subtle); }
+  .fdrawer__body { flex: 1; overflow-y: auto; padding: var(--space-6); display: grid; gap: var(--space-8); align-content: start; }
+  .fgroup { border: 0; padding: 0; margin: 0; display: grid; gap: var(--space-4); }
+  .fgroup__vals { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .fopt { display: inline-flex; }
+  .fswitch { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle); cursor: pointer; }
+  .fdrawer__foot { display: flex; gap: var(--space-3); padding: var(--space-5) var(--space-6) calc(var(--space-5) + env(safe-area-inset-bottom)); border-top: 1px solid var(--border-subtle); }
+  .fdrawer__foot .btn { flex: 1; }
+  @media (max-width: 749px) {
+    .shop__bar { flex-wrap: wrap; }
+    .shop__active { order: 4; flex-basis: 100%; }
+    .shop__count { margin-left: auto; }
+    .fdrawer__panel { inset: auto 0 0 0; width: 100%; max-height: 88dvh; border-right: 0; border-top: 1px solid var(--border-subtle); border-radius: var(--radius-sheet) var(--radius-sheet) 0 0; transform: translateY(100%); }
+  }
+  @media (prefers-reduced-motion: reduce) { .fdrawer__panel, .fdrawer__scrim { transition: none; } }
+</style>
+
+<script>
+  import '../../scripts/pages/shop';
+</script>

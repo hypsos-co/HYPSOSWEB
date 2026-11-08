@@ -1,0 +1,9 @@
+---
+/** Official HYPSOS cross — geometry from brand/source/CROSS_LOGO.ai (never redrawn). */
+import logos from '../../data/generated/logos.json';
+interface Props { class?: string; title?: string; decorative?: boolean; id?: string }
+const { class: cls = '', title = 'HYPSOS', decorative = true, id } = Astro.props;
+const c = logos.cross;
+---
+<svg id={id} class={`cross ${cls}`} viewBox={c.viewBox} fill="currentColor" role={decorative ? undefined : 'img'} aria-hidden={decorative ? 'true' : undefined} aria-label={decorative ? undefined : title}><path d={c.d}/></svg>
+<style>.cross{display:block;width:100%;height:auto;overflow:visible}</style>

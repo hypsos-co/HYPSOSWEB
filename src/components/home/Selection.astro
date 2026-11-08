@@ -1,0 +1,25 @@
+---
+import ProductCard from '../product/ProductCard.astro';
+import Icon from '../ui/Icon.astro';
+import { getDict, lp, type Locale } from '../../i18n';
+import type { Catalog } from '../../lib/types';
+interface Props { lang: Locale; catalog: Catalog }
+const { lang, catalog } = Astro.props;
+const t = getDict(lang).home.selection;
+const order = ['hoodie-001', 'oversized-tee-001', 'baggy-pant-001', 'crewneck-001'];
+const picked = [...order.map((h) => catalog.products.find((p) => p.handle === h)).filter(Boolean), ...catalog.products].filter((p, i, a) => a.indexOf(p) === i).slice(0, 4) as Catalog['products'];
+---
+<section class="sel section" aria-labelledby="sel-title">
+  <div class="wrap-full">
+    <div class="shead">
+      <div>
+        <span class="shead__eyebrow t-label" data-reveal="fade">{t.eyebrow}</span>
+        <h2 id="sel-title" class="t-section" data-split>{t.title}</h2>
+      </div>
+      <a class="btn btn--ghost" href={lp(lang, '/shop')} data-reveal="fade">{t.cta} <Icon name="arrow-right" class="btn__arrow" /></a>
+    </div>
+    <div class="pgrid">
+      {picked.map((p, i) => <ProductCard product={p} lang={lang} index={i} />)}
+    </div>
+  </div>
+</section>

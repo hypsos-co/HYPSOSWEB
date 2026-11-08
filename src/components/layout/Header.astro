@@ -1,0 +1,229 @@
+---
+import Wordmark from '../brand/Wordmark.astro';
+import Cross from '../brand/Cross.astro';
+import Icon from '../ui/Icon.astro';
+import { getDict, lp, LOCALES, LOCALE_META, type Locale } from '../../i18n';
+import type { Catalog } from '../../lib/types';
+import { imageForColor } from '../../lib/catalog';
+import { pickSrc } from '../../lib/img';
+
+interface Props { lang: Locale; catalog: Catalog; path: string; transparent?: boolean; hasAlternates?: boolean }
+const { lang, catalog, path, transparent = false, hasAlternates = true } = Astro.props;
+const t = getDict(lang);
+
+const cats = [
+  { key: 'tops', label: t.categories.tops },
+  { key: 'sweats', label: t.categories.sweats },
+  { key: 'bottoms', label: t.categories.bottoms },
+  { key: 'accessories', label: t.categories.accessories },
+].filter((c) => catalog.collections.some((x) => x.handle === c.key) || catalog.products.some((p) => p.category === c.key));
+const featured = catalog.products.find((p) => p.isNew) ?? catalog.products[0];
+const featuredImg = featured ? imageForColor(featured, featured.options.find((o) => o.key === 'color')?.values[0] ?? null) : null;
+const second = catalog.products.find((p) => p.category === 'bottoms' && p !== featured) ?? catalog.products[1];
+const secondImg = second ? imageForColor(second, second.options.find((o) => o.key === 'color')?.values[1] ?? second.options.find((o) => o.key === 'color')?.values[0] ?? null) : null;
+const isActive = (p: string) => path === p || path.startsWith(p + '/');
+---
+<header class:list={['hdr', { 'hdr--transparent': transparent }]} data-header>
+  <div class="hdr__bar">
+    <a href={lp(lang, '/')} class="hdr__logo" aria-label={t.a11y.home} data-cursor="explore">
+      <Wordmark decorative />
+    </a>
+
+    <nav class="hdr__nav" aria-label={t.a11y.mainNav}>
+      <ul role="list">
+        <li>
+          <button class="hdr__link t-label" type="button" aria-expanded="false" aria-controls="mega-shop" data-mega-trigger="shop">
+            <span>{t.nav.shop}</span>
+          </button>
+        </li>
+        <li><a class:list={['hdr__link t-label', { 'is-current': isActive('/collections') }]} href={lp(lang, '/collections')}><span>{t.nav.collections}</span></a></li>
+        <li><a class:list={['hdr__link t-label', { 'is-current': isActive('/about') }]} href={lp(lang, '/about')}><span>{t.nav.about}</span></a></li>
+        <li><a class:list={['hdr__link t-label', { 'is-current': isActive('/lookbook') }]} href={lp(lang, '/lookbook')}><span>{t.nav.lookbook}</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="hdr__tools">
+      {hasAlternates && (
+        <div class="hdr__lang" data-lang-switch>
+          {LOCALES.map((l) => (
+            <a class:list={['t-label', { 'is-on': l === lang }]} href={lp(l, path)} hreflang={LOCALE_META[l].hreflang} lang={LOCALE_META[l].htmlLang} aria-current={l === lang ? 'true' : undefined} aria-label={LOCALE_META[l].label}>{LOCALE_META[l].short}</a>
+          ))}
+        </div>
+      )}
+      <button class="icon-btn" type="button" aria-label={t.a11y.openSearch} data-search-open aria-haspopup="dialog"><Icon name="search" /></button>
+      <a class="icon-btn hdr__desk" href={lp(lang, '/favorites')} aria-label={t.nav.favorites}><Icon name="heart" /><span class="hdr__dot" data-fav-dot hidden></span></a>
+      <a class="icon-btn hdr__desk" href={lp(lang, '/account')} aria-label={t.nav.account}><Icon name="user" /></a>
+      <button class="hdr__bag" type="button" aria-label={t.a11y.openBag} data-cart-open aria-haspopup="dialog">
+        <Icon name="bag" />
+        <span class="hdr__count t-label" data-cart-count aria-hidden="true">0</span>
+      </button>
+      <button class="hdr__burger" type="button" aria-label={t.a11y.openMenu} aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle data-label-open={t.a11y.openMenu} data-label-close={t.a11y.closeMenu}>
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MEGA MENU: SHOP -->
+  <div class="mega" id="mega-shop" data-mega="shop" hidden>
+    <div class="mega__inner wrap-full">
+      <div class="mega__col mega__col--cats">
+        <p class="t-label t-muted">{t.nav.categories}</p>
+        <ul role="list" class="mega__big">
+          <li style="--i:0"><a href={lp(lang, '/shop')} data-cursor="explore">{t.nav.all}</a></li>
+          <li style="--i:1"><a href={lp(lang, '/collections/new-arrivals')}>{t.nav.newArrivals} <sup class="t-label">NEW</sup></a></li>
+          {cats.map((c, i) => <li style={`--i:${i + 2}`}><a href={lp(lang, `/collections/${c.key}`)}>{c.label}</a></li>)}
+        </ul>
+      </div>
+      <div class="mega__col mega__col--meta">
+        <p class="t-label t-muted">{t.nav.collections}</p>
+        <ul role="list" class="mega__small">
+          {catalog.collections.filter((c) => !cats.some((x) => x.key === c.handle) && c.handle !== 'new-arrivals').map((c) => (
+            <li><a class="link-u" href={lp(lang, `/collections/${c.handle}`)}>{c.title}</a></li>
+          ))}
+          <li><a class="link-u" href={lp(lang, '/lookbook')}>{t.nav.lookbook}</a></li>
+          <li><a class="link-u" href={lp(lang, '/campaigns')}>{t.nav.campaigns}</a></li>
+        </ul>
+        <div class="mega__cross" aria-hidden="true"><Cross /></div>
+      </div>
+      {featured && featuredImg && (
+        <a class="mega__card" href={lp(lang, `/products/${featured.handle}`)} data-cursor="view">
+          <span class="mega__media plinth"><img src={pickSrc(featuredImg, 480)} alt="" width="480" height="600" loading="lazy" decoding="async" /></span>
+          <span class="mega__cap"><span class="t-label t-muted">{t.nav.latest}</span><span>{featured.title}</span></span>
+        </a>
+      )}
+      {second && secondImg && (
+        <a class="mega__card mega__card--alt" href={lp(lang, `/products/${second.handle}`)} data-cursor="view">
+          <span class="mega__media plinth--dark"><img src={pickSrc(secondImg, 480)} alt="" width="480" height="600" loading="lazy" decoding="async" /></span>
+          <span class="mega__cap"><span class="t-label t-muted">{t.nav.featured}</span><span>{second.title}</span></span>
+        </a>
+      )}
+    </div>
+  </div>
+  <div class="mega-scrim" data-mega-scrim hidden></div>
+</header>
+
+<!-- MOBILE MENU -->
+<div class="mmenu" id="mobile-menu" data-mobile-menu hidden>
+  <div class="mmenu__inner">
+    <nav aria-label={t.a11y.mainNav}>
+      <ul role="list" class="mmenu__big">
+        <li style="--i:0"><a href={lp(lang, '/shop')}>{t.nav.shop}</a></li>
+        <li style="--i:1"><a href={lp(lang, '/collections')}>{t.nav.collections}</a></li>
+        <li style="--i:2"><a href={lp(lang, '/lookbook')}>{t.nav.lookbook}</a></li>
+        <li style="--i:3"><a href={lp(lang, '/about')}>{t.nav.about}</a></li>
+      </ul>
+      <ul role="list" class="mmenu__small">
+        <li style="--i:4"><a href={lp(lang, '/collections/new-arrivals')}>{t.nav.newArrivals}</a></li>
+        {cats.map((c, i) => <li style={`--i:${i + 5}`}><a href={lp(lang, `/collections/${c.key}`)}>{c.label}</a></li>)}
+        <li style="--i:9"><a href={lp(lang, '/campaigns')}>{t.nav.campaigns}</a></li>
+        <li style="--i:10"><a href={lp(lang, '/favorites')}>{t.nav.favorites}</a></li>
+        <li style="--i:11"><a href={lp(lang, '/account')}>{t.nav.account}</a></li>
+        <li style="--i:12"><a href={lp(lang, '/help')}>{t.nav.help}</a></li>
+      </ul>
+    </nav>
+    <div class="mmenu__foot">
+      {hasAlternates && (
+        <div class="mmenu__lang" role="group" aria-label={t.a11y.language}>
+          {LOCALES.map((l) => (
+            <a class:list={['chip', { 'is-on': l === lang }]} href={lp(l, path)} hreflang={LOCALE_META[l].hreflang} aria-current={l === lang ? 'true' : undefined}>{LOCALE_META[l].short}</a>
+          ))}
+        </div>
+      )}
+      <a class="t-label" href="https://www.instagram.com/hypsos.co" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
+      <a class="t-label" href="mailto:hypsos.co@gmail.com">hypsos.co@gmail.com</a>
+    </div>
+    <div class="mmenu__cross" aria-hidden="true"><Cross /></div>
+  </div>
+</div>
+
+<style>
+  .hdr {
+    position: fixed; inset: 0 0 auto 0; z-index: var(--z-header);
+    color: var(--color-ice);
+    transition: transform .6s var(--ease-standard), background-color .5s var(--ease-standard);
+  }
+  .hdr::before { /* scrolled backdrop */
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: var(--obsidian-90); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    border-bottom: 1px solid var(--border-subtle);
+    opacity: 1; transition: opacity .5s var(--ease-standard);
+  }
+  .hdr--transparent:not(.is-scrolled):not(.is-mega)::before { opacity: 0; }
+  .hdr.is-hidden:not(.is-mega) { transform: translateY(-100%); }
+  :global(html.is-locked) .hdr { transform: none; }
+
+  .hdr__bar {
+    height: var(--header-h); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-6);
+    padding-inline: var(--gutter);
+  }
+  .hdr__logo { width: clamp(96px, 9vw, 128px); justify-self: start; transition: opacity .3s; }
+  .hdr__logo:hover { opacity: .8; }
+  .hdr__nav ul { display: flex; gap: clamp(20px, 2.6vw, 40px); }
+  .hdr__link { position: relative; display: inline-flex; padding: 14px 0; color: var(--text-primary); }
+  .hdr__link span { position: relative; }
+  .hdr__link span::after { content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 1px; background: var(--color-crimson); transform: scaleX(0); transform-origin: right; transition: transform .6s var(--ease-standard); }
+  .hdr__link:hover span::after, .hdr__link[aria-expanded="true"] span::after, .hdr__link.is-current span::after { transform: scaleX(1); transform-origin: left; }
+  .hdr__tools { display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
+  .hdr__lang { display: flex; gap: 2px; margin-right: var(--space-3); }
+  .hdr__lang a { padding: 10px 6px; color: var(--text-muted); transition: color .3s; }
+  .hdr__lang a.is-on, .hdr__lang a:hover { color: var(--text-primary); }
+  .hdr__lang a.is-on { text-decoration: underline; text-decoration-color: var(--color-crimson); text-underline-offset: 5px; }
+  .hdr__bag { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 10px; border-radius: var(--radius-pill); }
+  .hdr__bag :global(svg) { width: 20px; height: 20px; }
+  .hdr__count { min-width: 20px; height: 20px; padding: 0 5px; display: inline-grid; place-items: center; border-radius: 10px; background: var(--ice-14); font-size: 10px; letter-spacing: 0; transition: background-color .3s, color .3s, transform .5s var(--ease-spring); }
+  .hdr__count.has-items { background: var(--color-crimson); color: var(--color-ice); }
+  .hdr__count.is-bump { transform: scale(1.35); }
+  .hdr__dot { position: absolute; top: 10px; right: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--color-crimson); }
+  .hdr__burger { display: none; width: 44px; height: 44px; position: relative; }
+  .hdr__burger span { position: absolute; left: 12px; right: 12px; height: 1.4px; background: currentColor; transition: transform .6s var(--ease-expressive), top .6s var(--ease-expressive); }
+  .hdr__burger span:first-child { top: 18px; }
+  .hdr__burger span:last-child { top: 25px; }
+  .hdr__burger[aria-expanded="true"] span:first-child { top: 21.5px; transform: rotate(45deg); }
+  .hdr__burger[aria-expanded="true"] span:last-child { top: 21.5px; transform: rotate(-45deg); }
+
+  /* mega */
+  .mega { position: absolute; inset: 100% 0 auto 0; background: var(--color-obsidian); border-bottom: 1px solid var(--border-subtle); clip-path: inset(0 0 100% 0); transition: clip-path .8s var(--ease-expressive); }
+  .mega.is-open { clip-path: inset(0 0 0 0); }
+  .mega__inner { display: grid; grid-template-columns: 1.3fr 1fr .9fr .9fr; gap: var(--space-10); padding-top: var(--space-10); padding-bottom: var(--space-12); }
+  .mega__col { display: flex; flex-direction: column; gap: var(--space-5); position: relative; }
+  .mega__big { display: flex; flex-direction: column; gap: 2px; }
+  .mega__big a { display: inline-block; font: 400 clamp(2rem, 3.2vw, 3.25rem)/1 var(--font-display); letter-spacing: -0.03em; color: var(--text-primary); transition: color .3s, transform .6s var(--ease-standard); }
+  .mega__big a:hover { color: var(--color-crimson); transform: translateX(10px); }
+  .mega__big sup { color: var(--color-crimson); font-size: 10px; vertical-align: top; margin-left: 4px; }
+  .mega__small { display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--fs-body); }
+  .mega__cross { position: absolute; bottom: 0; left: 0; width: 56px; color: var(--color-crimson); opacity: .9; }
+  .mega__card { display: flex; flex-direction: column; gap: var(--space-3); }
+  .mega__media { display: block; aspect-ratio: 4/5; overflow: hidden; }
+  .mega__media img { width: 100%; height: 100%; object-fit: contain; transition: transform 1.2s var(--ease-standard); }
+  .mega__card:hover img { transform: scale(1.06); }
+  .mega__cap { display: flex; flex-direction: column; gap: 4px; font-size: var(--fs-small); }
+  .mega li, .mega__card { opacity: 0; transform: translateY(14px); transition: opacity .6s var(--ease-standard), transform .8s var(--ease-standard); transition-delay: calc(var(--i, 4) * 40ms + 120ms); }
+  .mega.is-open li, .mega.is-open .mega__card { opacity: 1; transform: none; }
+  .mega__card--alt { --i: 6; }
+  .mega-scrim { position: fixed; inset: 0; top: var(--header-h); z-index: -2; background: var(--obsidian-56); backdrop-filter: blur(4px); opacity: 0; transition: opacity .5s; }
+  .mega-scrim.is-open { opacity: 1; }
+
+  /* mobile menu */
+  .mmenu { position: fixed; inset: 0; z-index: calc(var(--z-header) - 2); background: var(--color-obsidian); padding: calc(var(--header-h) + var(--space-6)) var(--gutter) calc(var(--space-6) + env(safe-area-inset-bottom)); overflow-y: auto; clip-path: circle(0% at calc(100% - 38px) 30px); transition: clip-path .9s var(--ease-expressive); }
+  .mmenu.is-open { clip-path: circle(150% at calc(100% - 38px) 30px); }
+  .mmenu__inner { min-height: 100%; display: flex; flex-direction: column; gap: var(--space-10); position: relative; }
+  .mmenu__big a { display: block; font: 400 clamp(3rem, 15vw, 5.5rem)/.95 var(--font-display); letter-spacing: -0.045em; padding: 4px 0; }
+  .mmenu__big a:active { color: var(--color-crimson); }
+  .mmenu__small { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3) var(--space-4); font-size: var(--fs-body); color: var(--text-secondary); }
+  .mmenu__small a { display: block; padding: 6px 0; }
+  .mmenu li { opacity: 0; transform: translateY(24px); transition: opacity .6s var(--ease-standard), transform .9s var(--ease-standard); transition-delay: calc(var(--i) * 45ms + 250ms); }
+  .mmenu.is-open li { opacity: 1; transform: none; }
+  .mmenu__foot { margin-top: auto; display: flex; flex-wrap: wrap; gap: var(--space-5); align-items: center; color: var(--text-secondary); }
+  .mmenu__lang { display: flex; gap: var(--space-2); width: 100%; }
+  .mmenu__cross { position: absolute; right: 0; top: 0; width: 64px; color: var(--color-crimson); }
+  @media (prefers-reduced-motion: reduce) { .mmenu, .mega { transition: none; } }
+
+  @media (max-width: 1099px) {
+    .hdr__nav, .hdr__lang, .hdr__desk { display: none; }
+    .hdr__burger { display: inline-block; }
+    .hdr__bar { grid-template-columns: 1fr auto; }
+  }
+  @media (max-width: 749px) {
+    .hdr__logo { width: 92px; }
+  }
+</style>

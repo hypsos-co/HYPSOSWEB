@@ -1,0 +1,37 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+import { BUSINESS, BRAND } from '../../data/site';
+const ph = (s: string) => `<span class="ph">${s}</span>`;
+---
+<LegalLayout slug="privacidad" title="Política de privacidad" description="Cómo trata HYPSOS tus datos personales (RGPD y LOPDGDD).">
+  <h2>1. Responsable del tratamiento</h2>
+  <ul>
+    <li><strong>Responsable:</strong> <Fragment set:html={ph(BUSINESS.legalName)} /> — NIF <Fragment set:html={ph(BUSINESS.taxId)} /></li>
+    <li><strong>Domicilio:</strong> <Fragment set:html={ph(BUSINESS.address)} /></li>
+    <li><strong>Contacto:</strong> <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a></li>
+    <li><strong>Delegado de protección de datos:</strong> <Fragment set:html={ph(BUSINESS.dpo)} /></li>
+  </ul>
+  <h2>2. Qué datos tratamos</h2>
+  <table>
+    <thead><tr><th>Actividad</th><th>Datos</th><th>Finalidad</th><th>Base jurídica</th></tr></thead>
+    <tbody>
+      <tr><td>Compras</td><td>Identificativos, contacto, dirección, datos del pedido. El pago lo gestiona la pasarela de Shopify; HYPSOS no almacena datos completos de tarjeta.</td><td>Gestionar el pedido, el envío, devoluciones y atención al cliente; cumplir obligaciones fiscales y contables.</td><td>Ejecución de contrato (art. 6.1.b RGPD) y obligación legal (art. 6.1.c).</td></tr>
+      <tr><td>Contacto</td><td>Nombre, email, nº de pedido y mensaje.</td><td>Responder a tu consulta.</td><td>Consentimiento (art. 6.1.a) y, si se refiere a un pedido, ejecución de contrato.</td></tr>
+      <tr><td>Newsletter</td><td>Email e idioma.</td><td>Enviar novedades, lanzamientos y campañas de HYPSOS.</td><td>Consentimiento (art. 6.1.a), revocable en cualquier momento.</td></tr>
+      <tr><td>Cuenta de cliente</td><td>Datos de la cuenta gestionada por Shopify.</td><td>Consultar pedidos y datos.</td><td>Ejecución de contrato.</td></tr>
+      <tr><td>Navegación</td><td>Preferencias guardadas en tu dispositivo (bolsa, favoritos, consentimiento) y, solo si lo aceptas, cookies de analítica/marketing.</td><td>Funcionamiento de la tienda y, con consentimiento, análisis y publicidad.</td><td>Interés legítimo / necesidad técnica; consentimiento para cookies no esenciales.</td></tr>
+    </tbody>
+  </table>
+  <h2>3. Destinatarios y encargados</h2>
+  <p>Tus datos podrán ser tratados por proveedores que actúan como encargados del tratamiento: Shopify (plataforma de comercio electrónico y checkout), <Fragment set:html={ph('[PASARELAS DE PAGO]')} />, <Fragment set:html={ph('[TRANSPORTISTAS]')} />, <Fragment set:html={ph('[PROVEEDOR DE EMAIL / NEWSLETTER]')} />, <Fragment set:html={ph('[ALOJAMIENTO WEB]')} />. No cedemos datos a terceros salvo obligación legal.</p>
+  <h2>4. Transferencias internacionales</h2>
+  <p>Algunos proveedores (p. ej., Shopify) pueden tratar datos fuera del Espacio Económico Europeo. <Fragment set:html={ph('[VERIFICAR Y DETALLAR LAS GARANTÍAS APLICABLES: decisión de adecuación (EU-US Data Privacy Framework), cláusulas contractuales tipo, etc.]')} /></p>
+  <h2>5. Conservación</h2>
+  <p>Datos de pedidos: durante la relación contractual y los plazos legales de conservación (p. ej., fiscales y mercantiles) <Fragment set:html={ph('[PLAZOS]')} />. Consultas: el tiempo necesario para responder. Newsletter: hasta que retires tu consentimiento.</p>
+  <h2>6. Tus derechos</h2>
+  <p>Puedes ejercer los derechos de acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad, así como retirar tu consentimiento en cualquier momento, escribiendo a <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a> e indicando el derecho que ejerces. Si consideras que no hemos atendido correctamente tu solicitud, puedes presentar una reclamación ante la Agencia Española de Protección de Datos (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">www.aepd.es</a>).</p>
+  <h2>7. Menores de edad</h2>
+  <p><Fragment set:html={ph('[REVISAR CON ASESORÍA: edad mínima para registrarse y comprar. Según el art. 7 LOPDGDD, el consentimiento de menores de 14 años requiere el de sus progenitores o tutores.]')} /></p>
+  <h2>8. Seguridad</h2>
+  <p>Aplicamos medidas técnicas y organizativas apropiadas. Las comunicaciones del Sitio se realizan mediante conexión cifrada (HTTPS) y el pago se procesa en el checkout de Shopify.</p>
+</LegalLayout>

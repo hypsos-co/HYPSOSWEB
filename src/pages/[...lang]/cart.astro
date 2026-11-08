@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHead from '../../components/ui/PageHead.astro';
+import Icon from '../../components/ui/Icon.astro';
+import Cross from '../../components/brand/Cross.astro';
+import { getDict, localeParams, langFromParam, lp } from '../../i18n';
+import { getCatalog } from '../../lib/catalog';
+export function getStaticPaths() {
+  return localeParams();
+}
+const lang = langFromParam(Astro.params.lang);
+const t = getDict(lang);
+const catalog = await getCatalog(lang);
+---
+<BaseLayout lang={lang} path="/cart" title={t.cart.title} noindex mode="functional">
+  <PageHead eyebrow="HYPSOS / BAG" title={t.cart.title} size="section" />
+  <section class="cartp wrap-full">
+    <div class="cartp__lines">
+      <div data-cart-lines data-cart-page><div class="skeleton" style="height:180px"></div></div>
+      <div class="empty-state" data-cart-empty hidden>
+        <span class="cartp__cross" aria-hidden="true"><Cross /></span>
+        <p class="t-h3">{t.cart.empty}</p>
+        <p class="t-body">{t.cart.emptyText}</p>
+        <a class="btn" href={lp(lang, '/shop')}>{t.cart.emptyCta} <Icon name="arrow-right" class="btn__arrow" /></a>
+      </div>
+    </div>
+    <aside class="cartp__sum" data-cart-foot hidden aria-labelledby="sum-title">
+      <h2 id="sum-title" class="t-label t-muted">{t.cart.summary}</h2>
+      <div class="cartp__row"><span>{t.common.subtotal}</span><strong class="cartp__total" data-cart-subtotal>—</strong></div>
+      <p class="t-small t-muted">{t.common.taxNote}</p>
+      {catalog.source === 'demo' && <p class="notice"><span class="badge">DEMO</span><span>{t.demo.checkoutDisabled}</span></p>}
+      <p class="drawer__msg t-small" data-cart-msg role="status" hidden></p>
+      <button class="btn btn--lg btn--block btn--accent" type="button" data-checkout>{t.common.checkout} <Icon name="arrow-right" class="btn__arrow" /></button>
+      <a class="link-u t-small" href={lp(lang, '/shop')}>{t.common.continueShopping}</a>
+    </aside>
+  </section>
+</BaseLayout>
+<style>
+  .cartp { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: clamp(32px, 5vw, 80px); align-items: start; padding-bottom: var(--section-y); }
+  .cartp__lines { border-top: 1px solid var(--border-subtle); }
+  .cartp__cross { width: 48px; color: var(--color-crimson); }
+  .cartp__sum { position: sticky; top: calc(var(--header-h) + 24px); display: grid; gap: var(--space-4); padding: var(--space-6); border: 1px solid var(--border-subtle); background: var(--ice-04); }
+  .cartp__row { display: flex; justify-content: space-between; align-items: baseline; }
+  .cartp__total { font: 400 var(--fs-h3)/1 var(--font-display); }
+  @media (max-width: 899px) { .cartp { grid-template-columns: 1fr; } .cartp__sum { position: static; } }
+</style>

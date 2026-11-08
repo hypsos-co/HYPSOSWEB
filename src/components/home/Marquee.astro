@@ -1,0 +1,25 @@
+---
+import Cross from '../brand/Cross.astro';
+interface Props { items: string[]; tone?: 'crimson' | 'ice' | 'obsidian'; speed?: number; reverse?: boolean }
+const { items, tone = 'crimson', speed = 36, reverse = false } = Astro.props;
+const row = [...items, ...items];
+---
+<div class:list={['mq', `mq--${tone}`, { 'mq--rev': reverse }]} aria-hidden="true">
+  <div class="marquee" style={`--marquee-dur:${speed}s`}>
+    {[0, 1].map(() => (
+      <div class="marquee__track">
+        {row.map((it) => <span class="mq__item">{it}<span class="mq__cross"><Cross /></span></span>)}
+      </div>
+    ))}
+  </div>
+</div>
+<style>
+  .mq { padding-block: var(--space-4); overflow: hidden; }
+  .mq--crimson { background: var(--color-crimson); color: var(--color-ice); }
+  .mq--ice { background: var(--color-ice); color: var(--color-obsidian); }
+  .mq--obsidian { background: var(--color-obsidian); color: var(--color-ice); border-block: 1px solid var(--border-subtle); }
+  .mq__item { display: inline-flex; align-items: center; gap: var(--space-8); font: 400 clamp(1.25rem, 2.2vw, 2rem)/1 var(--font-display); letter-spacing: -0.02em; text-transform: uppercase; }
+  .mq__cross { width: 1.1em; display: inline-block; color: currentColor; }
+  .mq--crimson .mq__cross { color: var(--color-obsidian); }
+  .mq--rev .marquee__track { animation-direction: reverse; }
+</style>

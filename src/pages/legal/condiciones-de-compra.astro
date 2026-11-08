@@ -1,0 +1,33 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+import { BUSINESS, BRAND } from '../../data/site';
+const ph = (s: string) => `<span class="ph">${s}</span>`;
+---
+<LegalLayout slug="condiciones-de-compra" title="Condiciones de compra" description="Condiciones generales de contratación de la tienda HYPSOS.">
+  <h2>1. Vendedor</h2>
+  <p><Fragment set:html={ph(BUSINESS.legalName)} />, NIF <Fragment set:html={ph(BUSINESS.taxId)} />, con domicilio en <Fragment set:html={ph(BUSINESS.address)} />. Contacto: <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a>.</p>
+  <h2>2. Ámbito</h2>
+  <p>Estas condiciones regulan la compra de productos HYPSOS a través del Sitio por consumidores. Zonas de venta: <Fragment set:html={ph('[PAÍSES / ZONAS]')} />. Idioma del contrato: español.</p>
+  <h2>3. Proceso de compra</h2>
+  <ol>
+    <li>Selecciona el producto, la talla y el color y añádelo a la bolsa.</li>
+    <li>Pulsa “Finalizar compra”: serás dirigido al checkout seguro de Shopify.</li>
+    <li>Introduce tus datos de envío, elige método de envío y de pago, y revisa el resumen antes de confirmar.</li>
+    <li>Recibirás un email de confirmación del pedido. <Fragment set:html={ph('[INDICAR SI SE ARCHIVA EL CONTRATO Y CÓMO ACCEDER A ÉL]')} /></li>
+  </ol>
+  <p>Podrás identificar y corregir errores en los datos introducidos antes de confirmar el pedido.</p>
+  <h2>4. Precios e impuestos</h2>
+  <p>Los precios se muestran en euros (EUR). <Fragment set:html={ph('[CONFIRMAR: los precios incluyen IVA / impuestos aplicables]')} />. Los gastos de envío se muestran en el checkout antes del pago. Las ventas fuera de la UE pueden estar sujetas a aranceles e impuestos de importación <Fragment set:html={ph('[QUIÉN LOS ASUME]')} />.</p>
+  <h2>5. Pago</h2>
+  <p>Métodos disponibles: <Fragment set:html={ph('[MÉTODOS DE PAGO ACTIVOS EN SHOPIFY]')} />. El pago se procesa en el entorno seguro de Shopify y de la pasarela correspondiente.</p>
+  <h2>6. Disponibilidad</h2>
+  <p>Los productos están sujetos a disponibilidad. Si un producto deja de estar disponible tras el pedido, te informaremos y reembolsaremos el importe correspondiente sin demora.</p>
+  <h2>7. Envío y entrega</h2>
+  <p>Consulta zonas, plazos y costes en la página de <a href="/help/shipping">Envíos</a>. <Fragment set:html={ph('[PLAZO MÁXIMO DE ENTREGA]')} />. Salvo pacto en contrario, la entrega se realizará en un plazo máximo de 30 días naturales desde la celebración del contrato.</p>
+  <h2>8. Desistimiento, devoluciones y garantías</h2>
+  <p>Ver <a href="/legal/desistimiento">Derecho de desistimiento</a>, <a href="/legal/devoluciones">Devoluciones y reembolsos</a> y <a href="/legal/garantias">Garantías legales</a>.</p>
+  <h2>9. Atención al cliente y reclamaciones</h2>
+  <p>Escríbenos a <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a>. <Fragment set:html={ph('[HOJAS DE RECLAMACIÓN / SISTEMA DE RESOLUCIÓN ALTERNATIVA DE LITIGIOS, SI APLICA]')} /></p>
+  <h2>10. Legislación aplicable</h2>
+  <p>Legislación española, en particular el Real Decreto Legislativo 1/2007 (Ley General para la Defensa de los Consumidores y Usuarios) y la LSSI-CE, sin perjuicio de las normas imperativas del país de residencia del consumidor.</p>
+</LegalLayout>
